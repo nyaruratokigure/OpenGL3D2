@@ -77,6 +77,8 @@ bool Window::Init(int w, int h, const char*title) {
 		std::cerr << "ERROR:GLEWの初期化に失敗しました." << std::endl;
 		return false;
 	}
+	width = w;
+	height = h;
 
 	//OpenGLの情報をコンソールウィンドウに出力する
 	const GLubyte*renderer = glGetString(GL_RENDERER);

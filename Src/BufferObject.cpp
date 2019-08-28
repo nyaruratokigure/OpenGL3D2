@@ -32,7 +32,38 @@ bool BufferObject::Create(
 }
 
 /*
-Buffer Object
+バッファにデータを転送する
+
+@param offset 転送開始位置(バイト単位)
+@param size   転送するバイト数
+@param data   転送するデータへのポインタ
+
+@retval true  転送成功
+@retval false 転送失敗
+*/
+bool BufferObject::BufferSubData(GLintptr offset, GLsizeiptr size, const GLvoid* data)
+{
+	if (offset + size >= this->size) {
+		std::cerr << "[警告] " << __func__ << ": 転送先領域がバッファサイズを越えています.\n"
+			<< "  buffer size:" << this->size << " offset:" << offset << " size:" << size << "\n";
+		if (offset >= this->size) {
+			return false;
+		}
+		// 可能な範囲だけ転送を行う
+		size = this->size - offset;
+	}
+	glBindBuffer(target, id);
+	glBufferSubData(target, offset, size, data);
+	glBindBuffer(target, 0);
+	const GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cerr << "[エラー] " << __func__ << ": データの転送に失敗.\n";
+	}
+	return error == GL_NO_ERROR;
+}
+
+/*
+Buffer Objectを破棄する
 */
 void BufferObject::Destroy()
 {
