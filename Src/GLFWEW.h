@@ -22,6 +22,7 @@ public:
 	void InitTimer();
 	void UpdateTimer();
 	double DeltaTime() const;
+	double Time() const;
 	int Width() const { return width; }
 	int Height() const { return height; }
 	bool IsKeyPressed(int key)const;

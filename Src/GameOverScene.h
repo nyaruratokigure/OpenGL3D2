@@ -6,8 +6,7 @@
 #include"Scene.h"
 #include "Sprite.h"
 #include "Font.h"
-
-
+#include "Audio/Audio.h"
 
 /*
 ゲームオーバー画面
@@ -28,5 +27,7 @@ private:
 	std::vector<Sprite> sprites;
 	SpriteRenderer spriteRenderer;
 	FontRenderer fontRenderer;
+	Audio::SoundPtr bgm;
+	float timer = 0;
 };
 #endif // GAMEOVERSCENE_H_INCLUDED

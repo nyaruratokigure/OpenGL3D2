@@ -60,6 +60,48 @@
     <ClInclude Include="Src\Font.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Mesh.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Terrain.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\json11\json11.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Actor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Collision.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\PlayerActor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\SkeletalMesh.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\SkeletalMeshActor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\UniformBuffer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Audio\Audio.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\JizoActor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Clear.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Light.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\FramebufferObject.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Scene.cpp">
@@ -101,6 +143,48 @@
     <ClCompile Include="Src\Font.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Mesh.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Terrain.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\json11\json11.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Actor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Collision.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PlayerActor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SkeletalMesh.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SkeletalMeshActor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\UniformBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Audio\Audio.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\JizoActor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Clear.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Light.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FramebufferObject.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -110,12 +194,63 @@
     <None Include="Res\Sprite.frag">
       <Filter>リソース ファイル</Filter>
     </None>
+    <None Include="Res\StaticMesh.vert">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\StaticMesh.frag">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\SkeletalMesh.frag">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\SkeletalMesh.vert">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\Terrain.vert">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\Terrain.frag">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\Water.frag">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\DepthOfField.vert">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Res\DepthOfField.frag">
+      <Filter>リソース ファイル</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Res\hikatyo.jpg">
       <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="Res\futomomo.jpg">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Res\TitleBg.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_bk.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_dn.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_ft.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_rt.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_up.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_lf.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Res\Terrain_Plant_Normal.tga">
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>

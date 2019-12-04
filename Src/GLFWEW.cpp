@@ -154,6 +154,15 @@ void Window::UpdateTimer() {
 double Window::DeltaTime() const {
 	return deltaTime;
 }
+/*
+経過時間を取得する
+
+@return GLFWが初期化されてから経過時間(秒)
+*/
+double Window::Time() const
+{
+	return glfwGetTime();
+}
 
 /*
 ゲームパッドと状態を取得する

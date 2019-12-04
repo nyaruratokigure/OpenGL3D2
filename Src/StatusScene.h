@@ -6,6 +6,7 @@
 #include"Scene.h"
 #include "Sprite.h"
 #include "Font.h"
+#include "Audio/Audio.h"
 
 /*
 ステータス画面
@@ -26,6 +27,7 @@ private:
 	std::vector<Sprite> sprites;
 	SpriteRenderer spriteRenderer;
 	FontRenderer fontRenderer;
+	float timer = 0;
 };
 
 #endif // STATUSSCENE_H_INCLUDED

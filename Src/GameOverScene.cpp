@@ -5,7 +5,6 @@
 #include "TitleScene.h"
 #include "GLFWEW.h"
 
-
 /*
 シーンを初期化する
 @retval true  初期化成功
@@ -19,9 +18,12 @@ bool GameOverScene::Initialize()
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
+	//BGMを再生する
+	bgm = Audio::Engine::Instance().Prepare("Res/Audio/pirugrim.mp3");
+	bgm->Play(Audio::Flag_Loop);
+
 	fontRenderer.Init(1000);
 	fontRenderer.LoadFromFile("Res/font.fnt");
-
 
 	return true;
 }
@@ -32,8 +34,12 @@ bool GameOverScene::Initialize()
 void GameOverScene::ProcessInput()
 {
 	GLFWEW::Window& window = GLFWEW::Window::Instance();
-	if (window.GetGamePad().buttonDown& GamePad::START) {
+	/*if (window.GetGamePad().buttonDown& GamePad::START) {
 		SceneStack::Instance().Replace(std::make_shared<TitleScene>());
+	}*/
+	if (timer <= 0 && (window.GetGamePad().buttonDown & GamePad::START)) {
+		Audio::Engine::Instance().Prepare("Res/Audio/select.mp3")->Play();
+		timer = 1.0f;
 	}
 }
 
@@ -57,6 +63,15 @@ void GameOverScene::Update(float deltaTime)
 	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"ゲームオーバー画面");
 	fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();
+	//シーン切り替え待ち
+	if (timer > 0) {
+		timer -= deltaTime;
+		if (timer <= 0) {
+			bgm->Stop();
+			SceneStack::Instance().Replace(std::make_shared<TitleScene>());
+			return;
+		}
+	}
 }
 
 /*

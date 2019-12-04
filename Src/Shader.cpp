@@ -127,26 +127,10 @@ namespace Shader {
 	}
 
 	/*
-	ライトリストを初期化する
-
-	全ての光源の明るさを0にする
-	*/
-	void LightList::Init() {
-		ambient.color = glm::vec3(0);
-		directional.color = glm::vec3(0);
-		for (int i = 0; i < 4; ++i) {
-			point.color[i] = glm::vec3(0);
-		}
-		for (int i = 0; i < 4; ++i) {
-			spot.color[i] = glm::vec3(0);
-		}
-	}
-
-	/*
 	コンストラクタ
 	*/
 	Program::Program() {
-		lights.Init();
+
 	}
 
 
@@ -156,7 +140,7 @@ namespace Shader {
 	@param programID プログラムオブジェクトのID
 	*/
 	Program::Program(GLuint programId) {
-		lights.Init();
+		//lights.Init();
 		Reset(programId);
 	}
 
@@ -184,32 +168,66 @@ namespace Shader {
 		id = programId;
 		if (id == 0) {
 			locMatMVP = -1;
-			locAmbLightCol = -1;
-			locDirLightDir = -1;
-			locDirLightCol = -1;
-			locPointLightPos = -1;
-			locPointLightCol = -1;
-			locSpotLightDir = -1;
-			locSpotLightPos = -1;
-			locSpotLightCol = -1;
+			locMatModel = -1;
+			locPointLightCount = -1;
+			locPointLightIndex = -1;
+			locSpotLightCount = -1;
+			locSpotLightIndex = -1;
+			locCameraPosition = -1;
+			locTime = -1;
+			locViewInfo = -1;
+			locCameraInfo = -1;
 			return;
 		}
 
 		locMatMVP = glGetUniformLocation(id, "matMVP");
-		locAmbLightCol = glGetUniformLocation(id, "ambientLight.color");
-		locDirLightDir = glGetUniformLocation(id, "directionalLight.direction");
-		locDirLightCol = glGetUniformLocation(id, "directionalLight.color");
-		locPointLightPos = glGetUniformLocation(id, "pointLight.position");
-		locPointLightCol = glGetUniformLocation(id, "pointLight.color");
-		locSpotLightDir = glGetUniformLocation(id, "spotLight.dirAndCutOff");
-		locSpotLightPos = glGetUniformLocation(id, "spotLight.posAndInnerCutOff");
-		locSpotLightCol = glGetUniformLocation(id, "spotLight.color");
+		locMatModel = glGetUniformLocation(id, "matModel");
+		locPointLightCount = glGetUniformLocation(id, "pointLightCount");
+		locPointLightIndex = glGetUniformLocation(id, "pointLightIndex");
+		locSpotLightCount = glGetUniformLocation(id, "spotLightCount");
+		locSpotLightIndex = glGetUniformLocation(id, "spotLightIndex");
+		locCameraPosition = glGetUniformLocation(id, "cameraPosition");
+		locTime = glGetUniformLocation(id, "time");
+		locViewInfo = glGetUniformLocation(id, "viewInfo");
+		locCameraInfo = glGetUniformLocation(id, "cameraInfo");
 
+		glUseProgram(id);
 		const GLint texColorLoc = glGetUniformLocation(id, "texColor");
 		if (texColorLoc >= 0) {
-			glUseProgram(id);
 			glUniform1i(texColorLoc, 0);
 		}
+		for (int i = 0; i < 8; ++i) {
+			std::string name("texColorArray[");
+			name += static_cast<char>('0' + i);
+			name += ']';
+			const GLint texColorLoc = glGetUniformLocation(id, name.c_str());
+			if (texColorLoc >= 0) {
+				glUniform1i(texColorLoc, i);
+			}
+		}
+		for (GLint i = 0; i < 8; ++i) {
+			std::string name("texNormalArray[");
+			name += static_cast<char>('0' + i);
+			name += ']';
+			const GLint texColorLoc = glGetUniformLocation(id, name.c_str());
+			if (texColorLoc >= 0) {
+				glUniform1i(texColorLoc, i + 8);
+			}
+		}
+
+		const GLint locTexPointLightIndex = glGetUniformLocation(id, "texPointLightIndex");
+		if (locTexPointLightIndex >= 0) {
+		glUniform1i(locTexPointLightIndex, 4);
+		}
+		const GLint locTexSpotLightIndex = glGetUniformLocation(id, "texSpotLightIndex");;
+		if (locTexSpotLightIndex >= 0) {
+			glUniform1i(locTexSpotLightIndex, 5);
+		}
+		const GLint locTexCubeMap = glGetUniformLocation(id, "texCubeMap");
+		if (locTexCubeMap >= 0) {
+			glUniform1i(locTexCubeMap, 6);
+		}
+		glUseProgram(0);
 	}
 
 	/*
@@ -245,29 +263,6 @@ namespace Shader {
 	}
 
 	/*
-	描画に使われるライトを設定する
-
-	@param lights 設定するライト
-	*/
-	void Program::SetLightList(const LightList& lights)
-	{
-		this->lights = lights;
-
-		//ライトの色情報をGPUメモリに転送する
-		if (locAmbLightCol >= 0) {
-			glUniform3fv(locAmbLightCol, 1, &lights.ambient.color.x);
-		}
-		if (locDirLightCol >= 0) {
-			glUniform3fv(locDirLightCol, 1, &lights.directional.color.x);
-		}
-		if (locPointLightCol >= 0) {
-			glUniform3fv(locPointLightCol, 8, &lights.point.color[0].x);
-		}
-		if (locSpotLightCol >= 0) {
-			glUniform3fv(locSpotLightCol, 4, &lights.spot.color[0].x);
-		}
-	}
-	/*
 	描画に使われるビュープロジェクション行列
 
 	@param matMV 設定するビュープロジェクション行列
@@ -280,66 +275,100 @@ namespace Shader {
 	}
 
 	/*
-	メッシュを描画する
+	描画に使われるモデル行列を設定する
 
-	@param mesh		　描画するメッシュ
-	@oaram translate　平行移動量
-	@param rotate	  回転角度(ラジアン)
-	@param scale	  拡大縮小率(1=等倍,0.5=1/2倍,2.0=2倍)
-
-	この関数を使う前に、Use()を実行しておくこと
+	@param m 設定するモデル行列
 	*/
-	void Program::Draw(const Mesh& mesh,
-		const glm::vec3& translate, const glm::vec3& rotate, const glm::vec3& scale)
-	{
-		if (id == 0) {
-			return;
-		}
-		//モデル行列を計算する
-		const glm::mat4 matScale = glm::scale(glm::mat4(1), scale);
-		const glm::mat4 matRotateY = glm::rotate(glm::mat4(1), rotate.y, glm::vec3(0, 1, 0));
-		const glm::mat4 matRotateZY = glm::rotate(matRotateY, rotate.z, glm::vec3(0, 0, -1));
-		const glm::mat4 matRotateXZY = glm::rotate(matRotateZY, rotate.x, glm::vec3(1, 0, 0));
-		const glm::mat4 matTranslate = glm::translate(glm::mat4(1), translate);
-		const glm::mat4 matModelTR = matTranslate * matRotateXZY;
-		const glm::mat4 matModel = matModelTR*matScale;
-
-		//モデルビュープロジェクション行列を計算し、GPUメモリに転送する
-		const glm::mat4 matMVP = matVP * matModel;
-		glUniformMatrix4fv(locMatMVP, 1, GL_FALSE, &matMVP[0][0]);
-
-		//指向性ライトの向きをモデル座標系に変換して、GPUメモリに転送する
-		if (locDirLightDir >= 0) {
-			const glm::mat3 matInvRotate = glm::inverse(glm::mat3(matRotateXZY));
-			const glm::vec3 dirLightDirOnModel = matInvRotate * lights.directional.direction;
-			glUniform3fv(locDirLightDir, 1, &dirLightDirOnModel.x);
-		}
-		//モデル座標系におけるポイント・ライトの座標を計算して、GPUメモリに転送する
-		if (locPointLightPos >= 0) {
-			const glm::mat4 matInvModel = glm::inverse(matModelTR);
-			glm::vec3 pointLightPosOnModel[8];
-			for (int i = 0; i < 8; ++i) {
-				pointLightPosOnModel[i] = matInvModel * glm::vec4(lights.point.position[i], 1);
-			}
-			glUniform3fv(locPointLightPos, 8, &pointLightPosOnModel[0].x);
-		}
-		//モデル座標系におけるスポットライトの座標を計算して、GPUメモリに転送する
-		if (locSpotLightDir >= 0 && locSpotLightPos>=0) {
-			const glm::mat3 matInvRotate = glm::inverse(glm::mat3(matRotateXZY));
-			const glm::mat4 matInvModel = glm::inverse(matModelTR);
-			glm::vec4 spotLightDirOnModel[4];
-			glm::vec4 spotLightPosOnModel[4];
-			for (int i = 0; i < 4; ++i) {
-				const glm::vec3 invDir = matInvRotate * glm::vec3(lights.spot.dirAndCutOff[i]);
-				spotLightDirOnModel[i] = glm::vec4(invDir, lights.spot.dirAndCutOff[i].w);
-				const glm::vec3 pos = lights.spot.posAndInnerCutOff[i];
-				spotLightPosOnModel[i] = matInvModel * glm::vec4(pos, 1);
-				spotLightPosOnModel[i].w = lights.spot.posAndInnerCutOff[i].w;
-			}
-			glUniform4fv(locSpotLightDir, 4, &spotLightDirOnModel[0].x);
-			glUniform4fv(locSpotLightPos, 4, &spotLightPosOnModel[0].x);
+	void Program::SetModelMatrix(const glm::mat4& m) {
+		if (locMatModel >= 0) {
+			glUniformMatrix4fv(locMatModel, 1, GL_FALSE, &m[0][0]);
 		}
 	}
+
+	/*
+	@param count     描画に使用するポイントライトの数(0~8)
+	@param indexList 描画に使用するポイントライト番号の配列
+	*/
+	void Program::SetPointLightIndex(int count, const int*indexList)
+	{
+		if (locPointLightCount >= 0) {
+			glUniform1i(locPointLightCount, count);
+		}
+		if (locPointLightIndex >= 0 && count > 0) {
+			glUniform1iv(locPointLightIndex, count, indexList);
+		}
+	}
+
+	/*
+	描画に使われるライトを設定する
+	
+	@param count     描画に使用するスポットライトの数(0~8)
+	@param indexList 描画に使用するスポットライト番号の配列
+	*/
+	void Program::SetSpotLightIndex(int count, const int* indexList)
+	{
+		if (locSpotLightCount >= 0) {
+			glUniform1i(locSpotLightCount, count);
+		}
+		if (locSpotLightIndex >= 0 && count > 0) {
+			glUniform1iv(locSpotLightIndex, count, indexList);
+		}
+	}
+
+	/*
+	カメラ座標を設定する
+
+	@param pos カメラ座標
+	*/
+	void Program::SetCameraPosition(const glm::vec3& pos)
+	{
+		if (locCameraPosition >= 0) {
+			glUniform3fv(locCameraPosition, 1, &pos.x);
+		}
+	}
+	
+	/*
+	総経過時間を設定する
+	
+	@param time 総経過時間
+	*/
+	void Program::SetTime(float time)
+	{
+		if (locTime >= 0) {
+			glUniform1f(locTime, time);
+		}
+	}
+
+	/*
+	画面の情報を設定する
+
+	@param w    ウィンドウの幅(ピクセル単位)
+	@param h    ウィンドウの高さ(ピクセル単位)
+	@param near 最小z距離(m単位)
+	@param far  最大z距離(m単位)
+	*/
+	void Program::SetViewInfo(float w, float h, float near, float far)
+	{
+		if (locViewInfo >= 0) {
+			glUniform4f(locViewInfo, 1.0f / w, 1.0f / h, near, far);
+		}
+	}
+	/*
+	カメラの情報を設定する
+
+	@param focalPlane  焦平面(ピントの合う位置のレンズからの距離. mm単位)
+	@param focalLength 焦点距離(光が1点に集まる位置のレンズからの距離. mm単位)
+	@param aperture    開口(光の取入口のサイズ. mm単位)
+	@param sensorSize  センサーサイズ(光を受けるセンサーの横幅. mm単位)
+	*/
+	void Program::SetCameraInfo(float focalPlane, float focalLength, float aperture,
+		float sensorSize)
+	{
+		if (locCameraInfo >= 0) {
+			glUniform4f(locCameraInfo, focalPlane, focalLength, aperture, sensorSize);
+		}
+	}
+
 
 	/*
 	プログラムオブジェクトを作成する

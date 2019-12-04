@@ -8,7 +8,6 @@
 #include <glm/mat4x4.hpp>
 #include <memory>
 
-struct Mesh;
 
 namespace Shader {
 
@@ -19,43 +18,7 @@ namespace Shader {
 	GLuint BuildFromFile(const char*vspath, const char*fspath);
 
 
-	//環境光
-	struct AmbientLight {
-		glm::vec3 color;
-	};
 
-	//指向性ライト
-	struct DirectionalLight {
-		glm::vec3 direction;
-		glm::vec3 color;
-	};
-
-	//ポイント・ライト
-	struct PointLight {
-		glm::vec3 position[8];
-		glm::vec3 color[8];
-	};
-
-	//スポットライト
-	struct SpotLight {
-		glm::vec4 dirAndCutOff[4];//光の方向(xyzに入れる)とcos(反射角)(wに入れる)
-		glm::vec4 posAndInnerCutOff[4];
-		glm::vec3 color[4];
-	};
-	
-	/*
-	ライトをまとめた構造体
-	*/
-	struct LightList
-	{
-		AmbientLight ambient;
-		DirectionalLight directional;
-		PointLight point;
-		SpotLight spot;
-
-		void Init();
-	};
-	
 
 	/*
 	シェーダー・プログラム
@@ -72,27 +35,36 @@ namespace Shader {
 		bool IsNull() const;
 		void Use();
 		void BindTexture(GLuint, GLuint);
-		void SetLightList(const LightList&);
 		void SetViewProjectionMatrix(const glm::mat4&);
-		void Draw(const Mesh& mesh,
-			const glm::vec3& translate, const glm::vec3& rotate, const glm::vec3& scale);
+		void SetModelMatrix(const glm::mat4&);
+		void SetPointLightIndex(int count, const int* indexList);
+		void SetSpotLightIndex(int count, const int* indexList);
+		void SetCameraPosition(const glm::vec3&);
+		void SetTime(float);
+		void SetViewInfo(float w, float h, float near, float far);
+		void SetCameraInfo(float focalPlane, float focalLength, float aperture,
+			float sensorSize);
+
+		///プログラムIDを取得する
+		GLuint Get()const { return id; }
 
 	private:
 		GLuint id = 0;//プログラムID
 
 		//uniform変数の位置
 		GLint locMatMVP = -1;
-		GLint locAmbLightCol = -1;
-		GLint locDirLightDir = -1;
-		GLint locDirLightCol = -1;
-		GLint locPointLightPos = -1;
-		GLint locPointLightCol = -1;
-		GLint locSpotLightDir = -1;
-		GLint locSpotLightPos = -1;
-		GLint locSpotLightCol = -1;
+		GLint locMatModel = -1;
+		GLint locPointLightCount = -1;
+		GLint locPointLightIndex = -1;
+		GLint locSpotLightCount = -1;
+		GLint locSpotLightIndex = -1;
+		GLint locCameraPosition = -1;
+		GLint locTime = -1;
+		GLint locViewInfo = -1;
+		GLint locCameraInfo = -1;
+
 
 		glm::mat4 matVP = glm::mat4(1);//ビュープロジェクション行列
-		LightList lights;
 	};
 
 }//Shader namespace
