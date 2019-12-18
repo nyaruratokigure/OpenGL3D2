@@ -82,7 +82,8 @@ void main()
 	vec4 scroll = vec4(-0.01, -0.01, 0.005, 0.005) * time;
 	vec3 normalS = texture(texNormalArray[0], uv.xy + scroll.xy).rgb * 2.0 - 1.0;
 	vec3 normalL = texture(texNormalArray[0], uv.zw + scroll.zw).rgb * 2.0 - 1.0;
-	vec3 normal =  normalS * 0.5 + normalL;
+	float roughness =0.7;//êÖñ ÇÃçrÇÍãÔçá
+	vec3 normal =  (normalS * 0.5 + normalL)*vec3(roughness,roughness,1.0);
 	normal = normalize(matTBN * normal);
 
 
@@ -129,7 +130,8 @@ void main()
     0.299,-0.169, 0.500,
     0.587,-0.331,-0.419,
     0.114, 0.500,-0.081) * environmentColor;
-  yuv.r *= GetFresnelFactor(cameraVector, normal) * brightness;
+	yuv.r=pow(yuv.r,3.0);
+	yuv.r *= GetFresnelFactor(cameraVector, normal) * brightness;
   fragColor.rgb *= fragColor.a;
   fragColor.rgb += mat3(
     1.000, 1.000, 1.000,

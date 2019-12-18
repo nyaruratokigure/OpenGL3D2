@@ -235,7 +235,7 @@ void GetBuffer(const json11::Json& accessor, const json11::Json& bufferViews,
 	{
 		vbo.BufferSubData(vboEnd, size, data);
 		const GLintptr tmp = vboEnd;
-		vboEnd += size;
+		vboEnd += ((size+3)/4)*4;
 		return tmp;
 	}
 
@@ -252,7 +252,7 @@ void GetBuffer(const json11::Json& accessor, const json11::Json& bufferViews,
 	{
 		ibo.BufferSubData(iboEnd, size, data);
 		const GLintptr tmp = iboEnd;
-		iboEnd += size;
+		iboEnd += ((size+3)/4)*4;
 		return tmp;
 	}
 

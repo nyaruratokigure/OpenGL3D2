@@ -359,8 +359,8 @@ FOURCCを作成する
 
 		//テクスチャのパラメータを設定する
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -470,6 +470,31 @@ FOURCCを作成する
 		imageData->type = type;
 		imageData->data.swap(buf);
 		return true;
+	}
+
+	/*
+	テクスチャ・ラップ・モードを設定する
+
+	@param mode 設定するテクスチャ・ラップ・モード
+
+	横と縦の両方に同じラップモードを設定する
+	*/
+	void Interface::SetWrapMode(GLenum mode)
+	{
+		const GLuint id = Get();
+		if (!id) {
+			std::cerr << "[警告]" << __func__<<":テクスチャが設定されていません\n";
+		}
+		const GLenum target = Target();
+		glBindTexture(target, Get());
+		glTexParameteri(target, GL_TEXTURE_WRAP_S, mode);
+		glTexParameteri(target, GL_TEXTURE_WRAP_T, mode);
+		glBindTexture(target, 0);
+		const GLenum error = glGetError();
+		if (error) {
+			std::cerr << "[エラー]" << __func__ << "テクスチャ・ラップ・モードの設定に失敗(" <<
+				std::hex << error << ")\n";
+		}
 	}
 
 	/*
