@@ -48,8 +48,8 @@ namespace Mesh {
 		glm::vec4 baseColor = glm::vec4(1);
 		Texture::InterfacePtr texture[16];
 		Shader::ProgramPtr program;
-		//スケルタルメッシュ用のシェーダー
-		Shader::ProgramPtr progSkeletalMesh;
+		Shader::ProgramPtr progSkeletalMesh;//スケルタルメッシュ用のシェーダー
+		Shader::ProgramPtr progShadow;//影用のシェーダー
 	};
 
 	/*
@@ -107,8 +107,11 @@ namespace Mesh {
 		bool LoadMesh(const char* name);
 		FilePtr GetFile(const char* name)const;
 		void SetViewProjectionMatrix(const glm::mat4&)const;
+		void SetShadowViewProjectionMatrix(const glm::mat4&)const;
 		void SetCameraPosition(const glm::vec3&) const;
 		void SetTime(double) const;
+		void BindShadowTexture(const Texture::InterfacePtr &);
+		void UnbindShadowTexture();
 
 		void AddCube(const char* name);
 		FilePtr AddPlane(const char* name);
@@ -120,6 +123,13 @@ namespace Mesh {
 		const Shader::ProgramPtr& GetStaticMeshShader()const { return progStaticMesh; }
 		const Shader::ProgramPtr& GetTerrainShader() const { return progTerrain; }
 		const Shader::ProgramPtr& GetWaterShader() const { return progWater; }
+		const Shader::ProgramPtr& GetSkeletalMeshShader() const { return progSkeletalMesh; }
+		const Shader::ProgramPtr& GetShadowShader() const { return progShadow; }
+		const Shader::ProgramPtr& GetNonTexturedShadowShader() const {
+			return progNonTexturedShadow;}
+		const Shader::ProgramPtr& GetSkeletalShadowShader() const {
+			return progSkeletalShadow;}
+
 
 	private:
 		BufferObject vbo;
@@ -131,6 +141,11 @@ namespace Mesh {
 		Shader::ProgramPtr progTerrain;
 		Shader::ProgramPtr progWater;
 
+		//影用のシェーダー
+		Shader::ProgramPtr progShadow;
+		Shader::ProgramPtr progNonTexturedShadow;
+		Shader::ProgramPtr progSkeletalShadow;
+
 		//スケルタル・アニメーションに対応したメッシュを保持するメンバ変数
 		Shader::ProgramPtr progSkeletalMesh;
 		struct MeshIndex {
@@ -140,9 +155,19 @@ namespace Mesh {
 		};
 		std::unordered_map<std::string, MeshIndex> meshes;
 		std::unordered_map<std::string, ExtendedFilePtr> extendedFiles;
+
+		GLenum shadowTextureTarget = GL_NONE;
 	};
 
-	void Draw(const FilePtr&, const glm::mat4& matM);
+	/*
+	描画するデータの種類
+	*/
+	enum class DrawType {
+		color,//通常の描画
+		shadow,//影の描画
+	};
+	void Draw(const FilePtr&, const glm::mat4& matM,
+		DrawType drawType = DrawType::color);
 
 } // namespace Mesh
 

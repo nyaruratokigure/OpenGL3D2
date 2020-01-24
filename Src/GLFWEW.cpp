@@ -288,8 +288,8 @@ void Window::UpdateGamePad()
 			{ GLFW_KEY_L, GamePad::R },
 			{ GLFW_KEY_ENTER, GamePad::START },
 			{ GLFW_KEY_W, GamePad::DPAD_UP },
-			{ GLFW_KEY_A, GamePad::DPAD_DOWN },
-			{ GLFW_KEY_S, GamePad::DPAD_LEFT },
+			{ GLFW_KEY_S, GamePad::DPAD_DOWN },
+			{ GLFW_KEY_A, GamePad::DPAD_LEFT },
 			{ GLFW_KEY_D, GamePad::DPAD_RIGHT },
 		};
 

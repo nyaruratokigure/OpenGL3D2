@@ -45,6 +45,8 @@ namespace Shader {
 		void SetCameraInfo(float focalPlane, float focalLength, float aperture,
 			float sensorSize);
 		void SetBlurDirection(float x, float y);
+		void SetShadowViewProjectionMatrix(const glm::mat4&);
+		static const GLint shadowTextureBindingPoint = 16;
 
 		///プログラムIDを取得する
 		GLuint Get()const { return id; }
@@ -64,6 +66,7 @@ namespace Shader {
 		GLint locViewInfo = -1;
 		GLint locCameraInfo = -1;
 		GLint locBlurDirection = -1;
+		GLint locMatShadow = -1;
 
 
 		glm::mat4 matVP = glm::mat4(1);//ビュープロジェクション行列

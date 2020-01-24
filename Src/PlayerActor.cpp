@@ -227,10 +227,10 @@ void PlayerActor::CheckRun(const GamePad& gamepad)
 		move += front;
 	}
 	else if (gamepad.buttons & GamePad::DPAD_DOWN) {
-		move += left;
+		move -= front;
 	}
 	if (gamepad.buttons & GamePad::DPAD_LEFT) {
-		move -= front;
+		move += left;
 	}
 	else if (gamepad.buttons & GamePad::DPAD_RIGHT) {
 		move -= left;

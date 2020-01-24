@@ -35,6 +35,7 @@ public:
 	bool HandleJizoEffects(int id, const glm::vec3& pos);
 
 private: 
+	void RenderMesh(Mesh::DrawType);
 	bool flag = false;
 	std::mt19937 rand;
 	int jizoId = -1; ///<Œ»Ýí“¬’†‚Ì‚¨’n‘ —l‚ÌID
@@ -85,6 +86,7 @@ private:
 	FrameBufferObjectPtr fboMain;
 	FrameBufferObjectPtr fboDepthOfField;
 	FrameBufferObjectPtr fboBloom[6][2];
+	FrameBufferObjectPtr fboShadow;
 };
 
 #endif // MAINGAMESCENE_H_INCLUDED

@@ -43,10 +43,12 @@ void SkeletalMeshActor::UpdateDrawData(float deltaTime)
 
 /**
 * •`‰æ.
+
+@param drawType •`‰æ‚·‚éƒf[ƒ^‚ÌŽí—Þ
 */
-void SkeletalMeshActor::Draw()
+void SkeletalMeshActor::Draw(Mesh::DrawType drawType)
 {
   if (mesh) {
-    mesh->Draw();
+    mesh->Draw(drawType);
   }
 }

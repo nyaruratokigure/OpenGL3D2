@@ -6,6 +6,8 @@
 layout(location=0) in vec3 inPosition;
 layout(location=1) in vec2 inTexCoord;
 layout(location=2) in vec3 inNormal;
+layout(location=6) in vec3 inShadowPosition;
+
 
 out vec4 fragColor;
 
@@ -45,6 +47,9 @@ uniform int pointLightIndex[8];
 uniform int spotLightCount; //スポットライトの数
 uniform int spotLightIndex[8];
 
+uniform sampler2DShadow texShadow;
+
+
 /**
 * スタティックメッシュ用フラグメントシェーダー.
 */
@@ -53,7 +58,8 @@ void main()
 vec3 normal = normalize(inNormal);
   vec3 lightColor = ambientLight.color.rgb;
   float power = max(dot(normal, -directionalLight.direction.xyz), 0.0);
-  lightColor += directionalLight.color.rgb * power;
+  float shadow = texture(texShadow, inShadowPosition); // 影の比率を取得.
+  lightColor += directionalLight.color.rgb * power*shadow;
 
   for (int i = 0; i < pointLightCount; ++i) {
     int id = pointLightIndex[i];

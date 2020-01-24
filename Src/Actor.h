@@ -26,7 +26,7 @@ public:
 
 	virtual void Update(float);
 	virtual void UpdateDrawData(float);
-	virtual void Draw();
+	virtual void Draw(Mesh::DrawType drawType);
 	virtual void OnHit(const ActorPtr&, const glm::vec3&) {
 
 	}
@@ -54,7 +54,7 @@ public:
 		const glm::vec3& scale = glm::vec3(1));
 	virtual ~StaticMeshActor() = default;
 
-	virtual void Draw() override;
+	virtual void Draw(Mesh::DrawType drawType) override;
 
 	const Mesh::FilePtr& GetMesh() const { return mesh; }
 	void SetPointLightList(const std::vector<int>&v);
@@ -88,7 +88,7 @@ public:
 	bool Remove(const ActorPtr&);
 	void Update(float);
 	void UpdateDrawData(float);
-	void Draw();
+	void Draw(Mesh::DrawType drawType);
 	bool Empty() const { return actors.empty(); }
 
 	// イテレーターを取得する関数
