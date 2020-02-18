@@ -102,6 +102,18 @@
     <ClInclude Include="Src\FramebufferObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Particle.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\TextWindow.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\EventScript.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\EventScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Scene.cpp">
@@ -185,6 +197,18 @@
     <ClCompile Include="Src\FramebufferObject.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Particle.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\TextWindow.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EventScript.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EventScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -239,12 +263,12 @@
     <None Include="Res\NonTexturedShadow.frag">
       <Filter>リソース ファイル</Filter>
     </None>
+    <None Include="Res\Particle.vert">
+      <Filter>リソース ファイル</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Res\hikatyo.jpg">
-      <Filter>リソース ファイル</Filter>
-    </Image>
-    <Image Include="Res\futomomo.jpg">
       <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="Res\TitleBg.tga">
@@ -271,5 +295,16 @@
     <Image Include="Res\Terrain_Plant_Normal.tga">
       <Filter>リソース ファイル</Filter>
     </Image>
+    <Image Include="Res\DiskParticle.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Res\FireParticle.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Res\OpeningScript.txt">
+      <Filter>リソース ファイル</Filter>
+    </Text>
   </ItemGroup>
 </Project>

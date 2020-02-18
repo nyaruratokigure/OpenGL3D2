@@ -7,6 +7,7 @@
 #include "Clear.h"
 #include "GLFWEW.h"
 #include "SkeletalMeshActor.h"
+#include "EventScene.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <iostream>
@@ -68,6 +69,11 @@ bool MainGameScene::Initialize()
 	fontRenderer.Init(1000);
 	fontRenderer.LoadFromFile("Res/font.fnt");
 
+	textWindow.Init("Res/TextWindow.tga",
+		glm::vec2(0, -248), glm::vec2(48, 32), glm::vec2(0));
+	textWindow.Open(
+		L"テキストウィンドウの実験\nこれは改行テスト。\n３行目。\n４\n５\n６");
+
 	meshBuffer.Init(1'000'000 * sizeof(Mesh::Vertex), 3'000'000 * sizeof(GLushort));
 	lightBuffer.Init(1);
 	lightBuffer.BindToShader(meshBuffer.GetStaticMeshShader());
@@ -79,6 +85,9 @@ bool MainGameScene::Initialize()
 	meshBuffer.LoadSkeletalMesh("Res/bikuni.gltf");
 	meshBuffer.LoadSkeletalMesh("Res/oni_small.gltf");
 	meshBuffer.LoadMesh("Res/wall_stone.gltf");
+
+	//パーティクル・システムを初期化する
+	particleSystem.Init(1000);
 
 	//FBOを作成する
 	const GLFWEW::Window& window = GLFWEW::Window::Instance();
@@ -270,6 +279,54 @@ bool MainGameScene::Initialize()
 			trees.Add(p);
 		}
 	}
+
+	//オープニングスクリプトを実行
+	SceneStack::Instance().Push(std::make_shared<EventScene>("Res/OpeningScript.txt"));
+
+	//パーティクル・システムのテスト用にエミッターを追加
+	{
+	//	//エミッター1個目
+	//	ParticleEmitterParameter ep;
+	//	ep.imagePath = "Res/FireParticle.tga";
+	//	ep.tiles = glm::ivec2(2, 2);
+	//	ep.position = glm::vec3(96.5f, 0, 95);
+	//	ep.position.y = heightMap.Height(ep.position);
+	//	ep.emissionsPerSecond = 20.0f;
+	//	ep.dstFactor = GL_ONE;//加算合成
+	//	ep.gravity = 0;
+	//	ParticleParameter pp;
+	//	pp.scale = glm::vec2(0.5f);
+	//	pp.color = glm::vec4(0.9f, 0.3f, 0.1f, 1.0f);
+	//	particleSystem.Add(ep, pp);
+	//}
+	//{
+	//	//エミッター2個目
+	//	ParticleEmitterParameter ep;
+	//	ep.imagePath = "Res/DiskParticle.tga";
+	//	ep.position = glm::vec3(97, 0, 100);
+	//	ep.position.y = heightMap.Height(ep.position);
+	//	ep.angle = glm::radians(30.0f);
+	//	ParticleParameter pp;
+	//	pp.lifetime = 2;
+	//	pp.scale = glm::vec2(0.2f);
+	//	pp.velocity = glm::vec3(0, 3, 0);
+	//	pp.color = glm::vec4(0.1f, 0.3f, 0.8f, 1.0f);
+	//	particleSystem.Add(ep, pp);
+	//}
+	//{
+	//	//エミッター3個目
+	//	ParticleEmitterParameter ep;
+	//	ep.imagePath = "Res/DiskParticle.tga";
+	//	ep.position = glm::vec3(90, 0, 90);
+	//	ep.position.y = heightMap.Height(ep.position);
+	//	ep.angle = glm::radians(60.0f);
+	//	ParticleParameter pp;
+	//	pp.lifetime = 2;
+	//	pp.scale = glm::vec2(0.5f);
+	//	pp.velocity = glm::vec3(0, 1, 0);
+	//	pp.color = glm::vec4(0.1f, 0.9f, 0.3f, 1.0f);
+	//	particleSystem.Add(ep, pp);
+	}
 	return true;
 }
 
@@ -395,7 +452,7 @@ void MainGameScene::Update(float deltaTime)
 		p->SetSpotLightList(spotLightIndex);
 	}
 
-
+	particleSystem.Update(deltaTime);
 
 	//敵を全滅させたら目的達成フラグをtrueにする
 	if (jizoId >= 0) {
@@ -440,6 +497,7 @@ void MainGameScene::Update(float deltaTime)
 			return;
 		}
 	}
+	textWindow.Update(deltaTime);
 }
 
 /*
@@ -514,6 +572,7 @@ void MainGameScene::Render()
 	meshBuffer.BindShadowTexture(fboShadow->GetDepthTexture());
 
 	RenderMesh(Mesh::DrawType::color);
+	particleSystem.Draw(matProj, matView);
 
 	meshBuffer.UnbindShadowTexture();
 
@@ -615,6 +674,7 @@ void MainGameScene::Render()
 		simpleMesh->materials[0].texture[0] = fboBloom[0][0]->GetColorTexture();
 		Mesh::Draw(simpleMesh, glm::mat4(1));
 
+		textWindow.Draw();
 		fontRenderer.Draw(screenSize);
 	}
 
@@ -650,8 +710,8 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 	for (size_t i = 0; i < oniCount; i++)
 	{
 		glm::vec3 position(pos);
-		position.x += std::uniform_real_distribution<float>(-15, 15)(rand);
-		position.z += std::uniform_real_distribution<float>(-15, 15)(rand);
+		position.x += std::uniform_real_distribution<float>(-10, 10)(rand);
+		position.z += std::uniform_real_distribution<float>(-10, 10)(rand);
 		position.y = heightMap.Height(position);
 
 		glm::vec3 rotation(0);

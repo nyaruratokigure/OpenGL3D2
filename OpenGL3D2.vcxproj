@@ -89,6 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,6 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,6 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,6 +156,8 @@
     <ClInclude Include="Src\BufferObject.h" />
     <ClInclude Include="Src\Clear.h" />
     <ClInclude Include="Src\Collision.h" />
+    <ClInclude Include="Src\EventScene.h" />
+    <ClInclude Include="Src\EventScript.h" />
     <ClInclude Include="Src\Font.h" />
     <ClInclude Include="Src\FramebufferObject.h" />
     <ClInclude Include="Src\GameOverScene.h" />
@@ -163,6 +169,7 @@
     <ClInclude Include="Src\Light.h" />
     <ClInclude Include="Src\MainGameScene.h" />
     <ClInclude Include="Src\Mesh.h" />
+    <ClInclude Include="Src\Particle.h" />
     <ClInclude Include="Src\PlayerActor.h" />
     <ClInclude Include="Src\Scene.h" />
     <ClInclude Include="Src\Shader.h" />
@@ -172,6 +179,7 @@
     <ClInclude Include="Src\StatusScene.h" />
     <ClInclude Include="Src\Terrain.h" />
     <ClInclude Include="Src\Texture.h" />
+    <ClInclude Include="Src\TextWindow.h" />
     <ClInclude Include="Src\TitleScene.h" />
     <ClInclude Include="Src\UniformBuffer.h" />
     <ClInclude Include="stdafx.h" />
@@ -184,6 +192,8 @@
     <ClCompile Include="Src\BufferObject.cpp" />
     <ClCompile Include="Src\Clear.cpp" />
     <ClCompile Include="Src\Collision.cpp" />
+    <ClCompile Include="Src\EventScene.cpp" />
+    <ClCompile Include="Src\EventScript.cpp" />
     <ClCompile Include="Src\Font.cpp" />
     <ClCompile Include="Src\FramebufferObject.cpp" />
     <ClCompile Include="Src\GameOverScene.cpp" />
@@ -193,6 +203,7 @@
     <ClCompile Include="Src\Light.cpp" />
     <ClCompile Include="Src\MainGameScene.cpp" />
     <ClCompile Include="Src\Mesh.cpp" />
+    <ClCompile Include="Src\Particle.cpp" />
     <ClCompile Include="Src\PlayerActor.cpp" />
     <ClCompile Include="Src\Scene.cpp" />
     <ClCompile Include="Src\Shader.cpp" />
@@ -202,6 +213,7 @@
     <ClCompile Include="Src\StatusScene.cpp" />
     <ClCompile Include="Src\Tecture.cpp" />
     <ClCompile Include="Src\Terrain.cpp" />
+    <ClCompile Include="Src\TextWindow.cpp" />
     <ClCompile Include="Src\TitleScene.cpp" />
     <ClCompile Include="Src\UniformBuffer.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -213,6 +225,7 @@
     <None Include="Res\DepthOfField.vert" />
     <None Include="Res\NonTexturedShadow.frag" />
     <None Include="Res\NormalBlur.frag" />
+    <None Include="Res\Particle.vert" />
     <None Include="Res\Shadow.frag" />
     <None Include="Res\Simple.frag" />
     <None Include="Res\Simple.vert" />
@@ -233,10 +246,14 @@
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_lf.tga" />
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_rt.tga" />
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_up.tga" />
-    <Image Include="Res\futomomo.jpg" />
+    <Image Include="Res\DiskParticle.tga" />
+    <Image Include="Res\FireParticle.tga" />
     <Image Include="Res\hikatyo.jpg" />
     <Image Include="Res\Terrain_Plant_Normal.tga" />
     <Image Include="Res\TitleBg.tga" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Res\OpeningScript.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

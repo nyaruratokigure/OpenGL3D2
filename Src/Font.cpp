@@ -7,6 +7,8 @@
 #include <iostream>
 #include <stdio.h>
 
+
+
 /*
 フォント描画オブジェクトを初期化する
 @param maxCharacter  最大描画文字数
@@ -206,4 +208,19 @@ void FontRenderer::Draw(const glm::vec2& screenSize)const
 float FontRenderer::LineHeight() const
 {
 	return lineHeight;
+}
+
+/*
+文字の横幅を取得する
+
+@param c 横幅を調べる文字
+
+@return 文字cの横幅
+*/
+float FontRenderer::XAdvance(wchar_t c)const
+{
+	if (c < 0 || c >= characterInfoList.size()) {
+		return 0;
+	}
+	return characterInfoList[c].xadvance;
 }
