@@ -746,7 +746,7 @@ void GetBuffer(const json11::Json& accessor, const json11::Json& bufferViews,
 	void Buffer::UnbindShadowTexture()
 	{
 		if (shadowTextureTarget != GL_NONE) {
-			glActiveTexture(GL_TEXTURE + Shader::Program::shadowTextureBindingPoint);
+			glActiveTexture(GL_TEXTURE0 + Shader::Program::shadowTextureBindingPoint);
 			glBindTexture(shadowTextureTarget, 0);
 			shadowTextureTarget = GL_NONE;
 		}

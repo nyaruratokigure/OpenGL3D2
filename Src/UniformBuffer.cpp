@@ -89,5 +89,8 @@ bool UniformBuffer::BufferSubData(const GLvoid* data, GLintptr offset, GLsizeipt
 */
 void UniformBuffer::BindBufferRange(GLintptr offset, GLsizeiptr size) const
 {
-  glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, ubo, offset, size);
+	if (size > 0) {
+
+		glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, ubo, offset, size);
+	}
 }

@@ -301,6 +301,9 @@
     <Image Include="Res\FireParticle.tga">
       <Filter>リソース ファイル</Filter>
     </Image>
+    <Image Include="Res\ao.tga">
+      <Filter>リソース ファイル</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Res\OpeningScript.txt">

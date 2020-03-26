@@ -68,7 +68,7 @@ void LightBuffer::Update(const ActorList&al, const glm::vec3&ambientColor)
 			data.directionalLight.direction = glm::vec4(p->direction, 0);
 		}
 		else if (PointLightActorPtr p = std::dynamic_pointer_cast<PointLightActor>(*i)) {
-			if (pointLightCount < 100) {
+			if (pointLightCount < 10) {
 				p->index = pointLightCount;
 				PointLight & light = data.pointLight[pointLightCount];
 				light.color = glm::vec4(p->color, 1);
@@ -78,7 +78,7 @@ void LightBuffer::Update(const ActorList&al, const glm::vec3&ambientColor)
 			}
 		}
 		else if (SpotLightActorPtr p = std::dynamic_pointer_cast<SpotLightActor>(*i)) {
-			if (spotLightCount < 100) {
+			if (spotLightCount < 10) {
 				p->index = spotLightCount;
 				SpotLight & light = data.spotLight[spotLightCount];
 				light.color = glm::vec4(p->color, 1);

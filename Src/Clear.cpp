@@ -14,7 +14,7 @@ bool Clear::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/umi.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/ao.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -59,7 +59,7 @@ void Clear::Update(float deltaTime)
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
 	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"クリア画面");
-	fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
+	//fontRenderer.AddString(glm::vec2(-128, 0), L"クリア！");
 	fontRenderer.EndUpdate();
 	//シーン切り替え待ち
 	if (timer > 0) {

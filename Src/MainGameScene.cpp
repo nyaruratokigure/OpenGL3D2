@@ -2,6 +2,7 @@
 @file MainGameScene.cpp
 */
 #include "MainGameScene.h"
+#include "TitleScene.h"
 #include "StatusScene.h"
 #include "GameOverScene.h"
 #include "Clear.h"
@@ -72,7 +73,7 @@ bool MainGameScene::Initialize()
 	textWindow.Init("Res/TextWindow.tga",
 		glm::vec2(0, -248), glm::vec2(48, 32), glm::vec2(0));
 	textWindow.Open(
-		L"テキストウィンドウの実験\nこれは改行テスト。\n３行目。\n４\n５\n６");
+		L"地蔵を悪い鬼から救おう！\n(地蔵に触れてみよう)\nWASD :移動\nJ :攻撃");
 
 	meshBuffer.Init(1'000'000 * sizeof(Mesh::Vertex), 3'000'000 * sizeof(GLushort));
 	lightBuffer.Init(1);
@@ -183,7 +184,7 @@ bool MainGameScene::Initialize()
 	lights.Add(std::make_shared<DirectionalLightActor>(
 		"DirectionalLight", glm::vec3(1.0f,0.94f,0.91f), glm::normalize(glm::vec3(1, -2, -1))));
 	for (int i = 0; i < 50; ++i) {
-		glm::vec3 color = glm::vec3(1, 0.8f, 0.5f)*20.0f;
+		glm::vec3 color = glm::vec3(1, 0.8f, 0.5f)*20.0f;//ポイントライトの色＊明るさ
 		glm::vec3 position(0);
 		position.x = static_cast<float>(std::uniform_int_distribution<>(80, 120)(rand));
 		position.z = static_cast<float>(std::uniform_int_distribution<>(80, 120)(rand));
@@ -191,7 +192,7 @@ bool MainGameScene::Initialize()
 		lights.Add(std::make_shared<PointLightActor>("PointLight", color, position));
 	}
 	for (int i = 0; i < 50; ++i) {
-		glm::vec3 color = glm::vec3(1, 2, 3) * 25.0f;
+		glm::vec3 color = glm::vec3(1, 2, 3) * 2.0f;//スポットライトの色＊明るさ
 		glm::vec3 direction(glm::normalize(glm::vec3(0.25f, -1, 0.25f)));
 		glm::vec3 position(0);
 		position.x = static_cast<float>(std::uniform_int_distribution<>(lightRangeMin, lightRangeMax)(rand));
@@ -220,8 +221,8 @@ bool MainGameScene::Initialize()
 	//お地蔵様を配置
 	for (int i = 0; i < 4; ++i) {
 		glm::vec3 position(0);
-		position.x = static_cast<float>(std::uniform_int_distribution<>(75, 125)(rand));
-		position.z = static_cast<float>(std::uniform_int_distribution<>(75, 125)(rand));
+		position.x = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(90,110)(rand));
+		position.z = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(90,110)(rand));
 		position.y = heightMap.Height(position);
 		glm::vec3 rotation(0);
 		rotation.y = std::uniform_real_distribution<float>(0.0f, 3.14f * 2.0f)(rand);
@@ -260,7 +261,8 @@ bool MainGameScene::Initialize()
 
 	//木を配置
 	{
-		const size_t treeCount = 200;
+		const size_t treeCount = 30
+			;
 		trees.Reserve(treeCount);
 		const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/red_pine_tree.gltf");
 		for (size_t i = 0; i < treeCount; ++i) {
@@ -462,7 +464,10 @@ void MainGameScene::Update(float deltaTime)
 		}
 	}
 
-	if (achivements[0,1,2,3] == true) {
+	if (achivements[0] &&
+		achivements[1] &&
+		achivements[2] &&
+		achivements[3] ==true) {
 		bgm->Stop();
 		SceneStack::Instance().Replace(std::make_shared<Clear>());
 		return;
@@ -576,7 +581,6 @@ void MainGameScene::Render()
 
 	meshBuffer.UnbindShadowTexture();
 
-	
 	//被写界深度エフェクト
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, fboDepthOfField->GetFramebuffer());
@@ -678,17 +682,15 @@ void MainGameScene::Render()
 		fontRenderer.Draw(screenSize);
 	}
 
-#if 0
-	//デバッグのために、影用の深度テクスチャを表示する
-	{
-		glDisable(GL_BLEND);
-		Mesh::FilePtr simpleMesh = meshBuffer.GetFile("Simple");
-		simpleMesh->materials[0].texture[0] = fboShadow->GetDepthTexture();
-		glm::mat4 m = glm::scale(glm::translate(
-			glm::mat4(1), glm::vec3(-0.45f, 0, 0)), glm::vec3(0.5f, 0.89f, 1));
-		Mesh::Draw(simpleMesh, m);
-	}
-#endif
+	////デバッグのために、影用の深度テクスチャを表示する
+	//{
+	//	glDisable(GL_BLEND);
+	//	Mesh::FilePtr simpleMesh = meshBuffer.GetFile("Simple");
+	//	simpleMesh->materials[0].texture[0] = fboShadow->GetDepthTexture();
+	//	glm::mat4 m = glm::scale(glm::translate(
+	//		glm::mat4(1), glm::vec3(-0.45f, 0, 0)), glm::vec3(0.5f, 0.89f, 1));
+	//	Mesh::Draw(simpleMesh, m);
+	//}
 }
 
 /*
@@ -706,7 +708,7 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		return false;
 	}
 	jizoId = id;
-	const size_t oniCount = 8;
+	const size_t oniCount = 1;//おに
 	for (size_t i = 0; i < oniCount; i++)
 	{
 		glm::vec3 position(pos);
