@@ -59,7 +59,7 @@ bool MainGameScene::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/strike.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/kuro.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -70,10 +70,11 @@ bool MainGameScene::Initialize()
 	fontRenderer.Init(1000);
 	fontRenderer.LoadFromFile("Res/font.fnt");
 
-	textWindow.Init("Res/TextWindow.tga",
+	//テキストウィンドウを表示
+	/*textWindow.Init("Res/TextWindow.tga",
 		glm::vec2(0, -248), glm::vec2(48, 32), glm::vec2(0));
 	textWindow.Open(
-		L"地蔵を悪い鬼から救おう！\n(地蔵に触れてみよう)\nWASD :移動\nJ :攻撃");
+		L"地蔵を悪い鬼から救おう！\n(地蔵に触れてみよう)\nWASD :移動\nJ :攻撃");*/
 
 	meshBuffer.Init(1'000'000 * sizeof(Mesh::Vertex), 3'000'000 * sizeof(GLushort));
 	lightBuffer.Init(1);
@@ -167,7 +168,7 @@ bool MainGameScene::Initialize()
 	if (!heightMap.CreateMesh(meshBuffer, "Terrain")) {
 		return false;
 	}
-	if (!heightMap.CreateWaterMesh(meshBuffer, "Water", -3)) { //水面の高さは要調整
+	if (!heightMap.CreateWaterMesh(meshBuffer, "Water", -3)) { //水面の高さ
 		return false;
 	}
 
@@ -282,8 +283,8 @@ bool MainGameScene::Initialize()
 		}
 	}
 
-	//オープニングスクリプトを実行
-	SceneStack::Instance().Push(std::make_shared<EventScene>("Res/OpeningScript.txt"));
+	////オープニングスクリプトを実行
+	//SceneStack::Instance().Push(std::make_shared<EventScene>("Res/OpeningScript.txt"));
 
 	//パーティクル・システムのテスト用にエミッターを追加
 	{
@@ -401,10 +402,10 @@ void MainGameScene::Update(float deltaTime)
 			if (bb->health <= 0) {
 				bb->colLocal = Collision::Shape{};
 				bb->health = 1;
-				bb->GetMesh()->Play("Down", false);
+				bb->GetMesh()->Play("Down", false);//敵の死亡時のアニメーション
 			}
 			else {
-				bb->GetMesh()->Play("Hit", false);
+				bb->GetMesh()->Play("Hit", false);//敵がダメージを受けた際のアニメーション
 			}
 			hit = true;
 			}
@@ -489,7 +490,8 @@ void MainGameScene::Update(float deltaTime)
 	const float h = window.Height();
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
-	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"メインゲーム画面");
+	//fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), L"地蔵残り:%d",jizoId);
+
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();
 
@@ -708,7 +710,7 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		return false;
 	}
 	jizoId = id;
-	const size_t oniCount = 1;//おに
+	const size_t oniCount = 1;//出現させる敵の数
 	for (size_t i = 0; i < oniCount; i++)
 	{
 		glm::vec3 position(pos);
