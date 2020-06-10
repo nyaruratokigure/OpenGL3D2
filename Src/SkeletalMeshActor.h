@@ -20,6 +20,8 @@ public:
   virtual void Draw(Mesh::DrawType drawType) override;
 
   const Mesh::SkeletalMeshPtr& GetMesh() const { return mesh; }
+  virtual void SetTarget(ActorPtr name);
+   ActorPtr TAct;
 
 private:
   Mesh::SkeletalMeshPtr mesh;

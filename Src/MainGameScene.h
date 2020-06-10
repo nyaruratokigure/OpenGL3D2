@@ -16,6 +16,7 @@
 #include "FramebufferObject.h"
 #include "Particle.h"
 #include "TextWindow.h"
+#include "EnemyActor.h"
 #include <random>
 #include <vector>
 
@@ -40,6 +41,7 @@ private:
 	void RenderMesh(Mesh::DrawType);
 	bool flag = false;
 	std::mt19937 rand;
+	int jizoCount = 4;
 	int jizoId = -1; ///<Œ»Ýí“¬’†‚Ì‚¨’n‘ —l‚ÌID
 	bool achivements[4] = { false, false, false, false }; ///<“G“¢”°ó‘Ô
 	std::vector<Sprite> sprites;
@@ -81,6 +83,7 @@ private:
 	ActorList enemies;
 	ActorList trees;
 	ActorList objects;
+
 
 	LightBuffer lightBuffer;
 	ActorList lights;

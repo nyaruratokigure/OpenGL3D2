@@ -156,6 +156,7 @@
     <ClInclude Include="Src\BufferObject.h" />
     <ClInclude Include="Src\Clear.h" />
     <ClInclude Include="Src\Collision.h" />
+    <ClInclude Include="Src\EnemyActor.h" />
     <ClInclude Include="Src\EventScene.h" />
     <ClInclude Include="Src\EventScript.h" />
     <ClInclude Include="Src\Font.h" />
@@ -192,6 +193,7 @@
     <ClCompile Include="Src\BufferObject.cpp" />
     <ClCompile Include="Src\Clear.cpp" />
     <ClCompile Include="Src\Collision.cpp" />
+    <ClCompile Include="Src\EnemyActor.cpp" />
     <ClCompile Include="Src\EventScene.cpp" />
     <ClCompile Include="Src\EventScript.cpp" />
     <ClCompile Include="Src\Font.cpp" />

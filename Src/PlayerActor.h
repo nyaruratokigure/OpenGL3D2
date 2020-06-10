@@ -45,6 +45,7 @@ private:
 	float attackTimer = 0;     ///<UŒ‚ŽžŠÔ
 
 	const Terrain::HeightMap* heightMap = nullptr;
+
 };
 using PlayerActorPtr = std::shared_ptr<PlayerActor>;
 

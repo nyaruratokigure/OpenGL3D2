@@ -9,10 +9,12 @@
 #include "GLFWEW.h"
 #include "SkeletalMeshActor.h"
 #include "EventScene.h"
+#include "EnemyActor.h "
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <iostream>
 #include <random>
+#include <sstream>
 
 /*
 衝突を解決する
@@ -390,6 +392,9 @@ void MainGameScene::Update(float deltaTime)
 	DetectCollision(player, enemies);
 	DetectCollision(player, trees);
 	DetectCollision(player, objects);
+	DetectCollision(enemies, enemies);
+	DetectCollision(enemies, trees);
+	DetectCollision(enemies, objects);
 
 	//プレイヤーの攻撃判定
 	ActorPtr attackCollision = player->GetAttackCollision();
@@ -397,11 +402,13 @@ void MainGameScene::Update(float deltaTime)
 		bool hit = false;
 		DetectCollision(attackCollision, enemies,
 			[this, &hit](const ActorPtr& a, const ActorPtr& b, const glm::vec3& p) {
-			SkeletalMeshActorPtr bb = std::static_pointer_cast<SkeletalMeshActor>(b);
+			EnemyActorPtr bb = std::static_pointer_cast<EnemyActor>(b);
 			bb->health -= a->health;
 			if (bb->health <= 0) {
 				bb->colLocal = Collision::Shape{};
 				bb->health = 1;
+				
+				bb->Dead();
 				bb->GetMesh()->Play("Down", false);//敵の死亡時のアニメーション
 			}
 			else {
@@ -462,6 +469,7 @@ void MainGameScene::Update(float deltaTime)
 		if (enemies.Empty()) {
 			achivements[jizoId] = true;
 			jizoId = -1;
+			--jizoCount;
 		}
 	}
 
@@ -490,8 +498,10 @@ void MainGameScene::Update(float deltaTime)
 	const float h = window.Height();
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
-	//fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), L"地蔵残り:%d",jizoId);
-
+	std::wstringstream ss;
+	ss << L"未開放地蔵:" << jizoCount;
+	fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), ss.str().c_str());
+	//fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight),L"未開放地蔵 : 4");
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();
 
@@ -710,7 +720,7 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		return false;
 	}
 	jizoId = id;
-	const size_t oniCount = 1;//出現させる敵の数
+	const size_t oniCount = 3;//出現させる敵の数
 	for (size_t i = 0; i < oniCount; i++)
 	{
 		glm::vec3 position(pos);
@@ -720,12 +730,14 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 
 		glm::vec3 rotation(0);
 		rotation.y = std::uniform_real_distribution<float>(0, 3.14f * 2.0f)(rand);
-		const Mesh::SkeletalMeshPtr mesh = meshBuffer.GetSkeletalMesh("oni_small");
-		SkeletalMeshActorPtr p = std::make_shared<SkeletalMeshActor>(
-			mesh, "Kooni", 13, position, rotation);
+		EnemyActorPtr p = std::make_shared<EnemyActor>(
+			&heightMap, meshBuffer, position, rotation);
 		p->GetMesh()->Play("Wait");
-		p->colLocal = Collision::CreateCapsule(
-			glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);
+		/*p->colLocal = Collision::CreateCapsule(
+			glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);*/
+
+		//追いかけるターゲットを指定
+		p->SetTarget(player);
 		enemies.Add(p);
 	}
 	return true;

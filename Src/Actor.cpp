@@ -164,7 +164,7 @@ void StaticMeshActor::SetSpotLightList(const std::vector<int>&v)
 /*
 格納可能なアクター数を確保する
 
-@oaram reserveCount アクター配列の確保数
+@param reserveCount アクター配列の確保数
 */
 void ActorList::Reserve(size_t reserveCount)
 {
@@ -383,6 +383,9 @@ void DetectCollision(ActorList& a, ActorList& b, CollisionHandlerType handler)
 			continue;
 		}
 		for (const ActorPtr& actorB : b) {
+			if (actorA == actorB) {
+				continue;
+			}
 			if (actorB->health <= 0) {
 				continue;
 			}
