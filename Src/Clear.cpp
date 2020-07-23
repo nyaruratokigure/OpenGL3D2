@@ -14,7 +14,7 @@ bool Clear::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/ao.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/kiraa.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 

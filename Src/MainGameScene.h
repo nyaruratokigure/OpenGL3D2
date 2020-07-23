@@ -41,6 +41,7 @@ private:
 	void RenderMesh(Mesh::DrawType);
 	bool flag = false;
 	std::mt19937 rand;
+	int particleID = 0;
 	int jizoCount = 4;
 	int jizoId = -1; ///<Œ»Ýí“¬’†‚Ì‚¨’n‘ —l‚ÌID
 	bool achivements[4] = { false, false, false, false }; ///<“G“¢”°ó‘Ô
@@ -83,6 +84,7 @@ private:
 	ActorList enemies;
 	ActorList trees;
 	ActorList objects;
+	EnemyActorPtr enep;
 
 
 	LightBuffer lightBuffer;

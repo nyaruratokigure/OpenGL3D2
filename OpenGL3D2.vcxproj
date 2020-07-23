@@ -242,6 +242,7 @@
     <None Include="Res\Water.frag" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Mist.tga" />
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_bk.tga" />
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_dn.tga" />
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_ft.tga" />

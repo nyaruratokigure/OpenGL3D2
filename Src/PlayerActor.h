@@ -25,6 +25,11 @@ public:
 	void SetBoardingActor(ActorPtr);
 	const ActorPtr& GetAttackCollision() const { return attackCollision; }
 
+	bool dead = false;
+	void Dead() {
+		dead = true;
+	}
+
 private:
 	void CheckRun(const GamePad& gamepad);
 	void CheckJump(const GamePad& gamepad);

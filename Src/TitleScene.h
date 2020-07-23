@@ -29,6 +29,7 @@ private:
 	SpriteRenderer spriteRenderer;
 	FontRenderer fontRenderer;
 	float timer = 0;
+	float fontTimer = -1;
 	Audio::SoundPtr bgm;
 	bool isNext = false;
 };

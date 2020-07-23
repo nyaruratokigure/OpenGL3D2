@@ -14,7 +14,7 @@ bool TitleScene::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/TitleBg.dds"));
+	Sprite spr(Texture::Image2D::Create("Res/Title.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -35,8 +35,8 @@ void TitleScene::ProcessInput()
 {
 	GLFWEW::Window& window = GLFWEW::Window::Instance();
 	if (timer <= 0 && (window.GetGamePad().buttonDown & GamePad::START)) {
-		Audio::Engine::Instance().Prepare("Res/Audio/Start.wav")->Play();
-		timer = 1.0f;
+		Audio::Engine::Instance().Prepare("Res/Audio/TitleSE.wav")->Play();
+		timer = 3.0f;
 	}
 }
 
@@ -58,10 +58,12 @@ void TitleScene::Update(float deltaTime)
 	const float h = window.Height();
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
-	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"タイトル画面");
-	fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
-	fontRenderer.EndUpdate();
-	
+	//fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"タイトル画面");
+	fontRenderer.AddString(glm::vec2(-150, -125), L"P  r  e  s  s   A  n  y   K  e  y");
+	fontRenderer.EndUpdate(); 
+
+	fontTimer -= deltaTime;
+
 	//シーン切り替え待ち
 	if (timer > 0) {
 		timer -= deltaTime;
@@ -81,5 +83,14 @@ void TitleScene::Render()
 	const GLFWEW::Window& window = GLFWEW::Window::Instance();
 	const glm::vec2 screenSize(window.Width(), window.Height());
 	spriteRenderer.Draw(screenSize);
-	fontRenderer.Draw(screenSize);
+	if (timer > 0) {
+		if ((int)(fontTimer * 10) % 2) {
+			fontRenderer.Draw(screenSize);
+		}
+	}
+	else {
+		if ((int)fontTimer % 2) {
+			fontRenderer.Draw(screenSize);
+		}
+	}
 }

@@ -290,20 +290,26 @@ bool MainGameScene::Initialize()
 
 	//パーティクル・システムのテスト用にエミッターを追加
 	{
-	//	//エミッター1個目
-	//	ParticleEmitterParameter ep;
-	//	ep.imagePath = "Res/FireParticle.tga";
-	//	ep.tiles = glm::ivec2(2, 2);
-	//	ep.position = glm::vec3(96.5f, 0, 95);
-	//	ep.position.y = heightMap.Height(ep.position);
-	//	ep.emissionsPerSecond = 20.0f;
-	//	ep.dstFactor = GL_ONE;//加算合成
-	//	ep.gravity = 0;
-	//	ParticleParameter pp;
-	//	pp.scale = glm::vec2(0.5f);
-	//	pp.color = glm::vec4(0.9f, 0.3f, 0.1f, 1.0f);
-	//	particleSystem.Add(ep, pp);
-	//}
+		//エミッター1個目
+		for (auto p : objects) {
+			ParticleEmitterParameter ep;
+			
+			ep.id = particleID;
+			ep.imagePath = "Res/Mist.tga";
+			ep.tiles = glm::ivec2(2, 2);
+			ep.position = p->position;
+			//ep.position = glm::vec3(96.5f, 0, 95);
+			ep.position.y = heightMap.Height(ep.position);
+			ep.emissionsPerSecond = 20.0f;
+			ep.dstFactor = GL_ONE;//加算合成
+			ep.gravity = 0;
+			ParticleParameter pp;
+			pp.scale = glm::vec2(0.5f);
+			pp.color = glm::vec4(0.5f, 0.0f, 0.5f, 1.0f);
+			particleSystem.Add(ep, pp);
+			++particleID;
+		}
+	}
 	//{
 	//	//エミッター2個目
 	//	ParticleEmitterParameter ep;
@@ -331,7 +337,7 @@ bool MainGameScene::Initialize()
 	//	pp.velocity = glm::vec3(0, 1, 0);
 	//	pp.color = glm::vec4(0.1f, 0.9f, 0.3f, 1.0f);
 	//	particleSystem.Add(ep, pp);
-	}
+	//}
 	return true;
 }
 
@@ -397,10 +403,10 @@ void MainGameScene::Update(float deltaTime)
 	DetectCollision(enemies, objects);
 
 	//プレイヤーの攻撃判定
-	ActorPtr attackCollision = player->GetAttackCollision();
-	if (attackCollision) {
+	ActorPtr PlayerAttackCollision = player->GetAttackCollision();
+	if (PlayerAttackCollision) {
 		bool hit = false;
-		DetectCollision(attackCollision, enemies,
+		DetectCollision(PlayerAttackCollision, enemies,
 			[this, &hit](const ActorPtr& a, const ActorPtr& b, const glm::vec3& p) {
 			EnemyActorPtr bb = std::static_pointer_cast<EnemyActor>(b);
 			bb->health -= a->health;
@@ -418,11 +424,11 @@ void MainGameScene::Update(float deltaTime)
 			}
 		);
 		if (hit) {
-			attackCollision->health = 0;
+			PlayerAttackCollision->health = 0;
 		}
 	}
 	//死亡アニメーションの終わった敵を消す
-	for (auto& e : enemies) {
+	for (ActorPtr e : enemies) {
 		SkeletalMeshActorPtr enemy = std::static_pointer_cast<SkeletalMeshActor>(e);
 		Mesh::SkeletalMeshPtr mesh = enemy->GetMesh();
 		if (mesh->IsFinished()) {
@@ -434,6 +440,49 @@ void MainGameScene::Update(float deltaTime)
 			}
 		}
 	}
+
+	//エネミーの攻撃判定
+	for (ActorPtr e : enemies) {
+		EnemyActorPtr enemy = std::static_pointer_cast<EnemyActor>(e);
+		ActorPtr EnemyAttackCollision = enemy->GetAttackCollision();
+
+		if (EnemyAttackCollision) {
+			bool hit = false;
+			DetectCollision(EnemyAttackCollision, player,
+				[this, &hit](const ActorPtr& a, const ActorPtr& b, const glm::vec3& p) {
+				PlayerActorPtr bb = std::static_pointer_cast<PlayerActor>(b);
+				bb->health -= a->health;
+				if (bb->health <= 0) {
+					bb->colLocal = Collision::Shape{};
+
+					bb->Dead();
+					bb->GetMesh()->Play("Down", false);//プレイヤーの死亡時のアニメーション
+				}
+				else {
+					bb->GetMesh()->Play("Hit", false);//プレイヤーがダメージを受けた際のアニメーション
+				}
+				hit = true;
+			}
+			);
+			if (hit) {
+				EnemyAttackCollision->health = 0;
+			}
+		}
+
+	}
+	////死亡アニメーションの終わった敵を消す
+	//for (auto& e : enemies) {
+	//	SkeletalMeshActorPtr enemy = std::static_pointer_cast<SkeletalMeshActor>(e);
+	//	Mesh::SkeletalMeshPtr mesh = enemy->GetMesh();
+	//	if (mesh->IsFinished()) {
+	//		if (mesh->GetAnimation() == "Down") {
+	//			enemy->health = 0;
+	//		}
+	//		else {
+	//			mesh->Play("Wait");
+	//		}
+	//	}
+	//}
 
 	//ライトの更新
 	glm::vec3 ambientColor(0.1f, 0.05f, 0.15f);
@@ -467,6 +516,7 @@ void MainGameScene::Update(float deltaTime)
 	//敵を全滅させたら目的達成フラグをtrueにする
 	if (jizoId >= 0) {
 		if (enemies.Empty()) {
+			particleSystem.Remove( particleSystem.Find(jizoId));
 			achivements[jizoId] = true;
 			jizoId = -1;
 			--jizoCount;
@@ -480,6 +530,13 @@ void MainGameScene::Update(float deltaTime)
 		bgm->Stop();
 		SceneStack::Instance().Replace(std::make_shared<Clear>());
 		return;
+	}
+	if (player->dead == true) {
+		if (player->GetMesh()->IsFinished()) {
+			bgm->Stop();
+			SceneStack::Instance().Replace(std::make_shared<GameOverScene>());
+			return;
+		}
 	}
 	
 	player->UpdateDrawData(deltaTime);
@@ -498,10 +555,16 @@ void MainGameScene::Update(float deltaTime)
 	const float h = window.Height();
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
-	std::wstringstream ss;
-	ss << L"未開放地蔵:" << jizoCount;
-	fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), ss.str().c_str());
-	//fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight),L"未開放地蔵 : 4");
+
+	std::wstringstream ss1,ss2,ss3;
+	ss1 << L"未開放地蔵:" << jizoCount;
+	fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), ss1.str().c_str());
+	ss2 << L"HP:" << player->health;
+	fontRenderer.AddString(glm::vec2(w * 0.4f +20, h * 0.5f - lineHeight), ss2.str().c_str());
+	/*if (enep) {
+		ss3 << L"NA:" << enep->nowAction;
+		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
+	}*/
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();
 
@@ -720,7 +783,7 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		return false;
 	}
 	jizoId = id;
-	const size_t oniCount = 3;//出現させる敵の数
+	const size_t oniCount = 1;//出現させる敵の数
 	for (size_t i = 0; i < oniCount; i++)
 	{
 		glm::vec3 position(pos);
@@ -730,15 +793,15 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 
 		glm::vec3 rotation(0);
 		rotation.y = std::uniform_real_distribution<float>(0, 3.14f * 2.0f)(rand);
-		EnemyActorPtr p = std::make_shared<EnemyActor>(
+		enep = std::make_shared<EnemyActor>(
 			&heightMap, meshBuffer, position, rotation);
-		p->GetMesh()->Play("Wait");
-		/*p->colLocal = Collision::CreateCapsule(
+		enep->GetMesh()->Play("Wait");
+		/*enep->colLocal = Collision::CreateCapsule(
 			glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);*/
 
 		//追いかけるターゲットを指定
-		p->SetTarget(player);
-		enemies.Add(p);
+		enep->SetTarget(player);
+		enemies.Add(enep);
 	}
 	return true;
 }

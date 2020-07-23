@@ -15,7 +15,7 @@
 */
 EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 	const glm::vec3& pos, const glm::vec3& rot)
-	: SkeletalMeshActor(buffer.GetSkeletalMesh("oni_small"), "Enemy", 13, pos, rot),
+	: SkeletalMeshActor(buffer.GetSkeletalMesh("oni_small"), "Enemy", 3, pos, rot),
 	heightMap(hm)
 {
 	colLocal = Collision::CreateSphere(glm::vec3(0, 0.7f, 0), 0.7f);
@@ -28,7 +28,33 @@ EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 +*/
 void EnemyActor::Update(float deltaTime)
 {
-	CheckRun();
+	actionTimer -= deltaTime;
+	if (actionTimer<0) {
+		probability = rand() % 100;
+		if (probability < 70) {
+			actionTimer = 3;
+			nowAction = 1;
+			SRangeAttack();
+			
+			return;
+		}
+		else {
+			actionTimer = 2;
+			nowAction = 2;
+			nowPosition = position;//現在のエネミーの位置をコピー
+			Feint();
+			return;
+		}
+	}
+	else {
+		if (nowAction = 1) {
+			SRangeAttack();
+		}
+		else {
+			Feint();
+		}
+	}
+
 
 	//座標の更新.
 	SkeletalMeshActor::Update(deltaTime);
@@ -110,21 +136,24 @@ void EnemyActor::Update(float deltaTime)
 
 		case State::attack:
 			attackTimer += deltaTime;
-			if (attackTimer > 0.05f && attackTimer < 0.6f) {
+			if (attackTimer > 0.45f && attackTimer < 1.00f) {
 				if (!attackCollision) {
 					static const float radian = 1.0f;
-					const glm::vec3 front = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0)) * glm::vec4(0, 0, 1.5f, 1);
-					attackCollision = std::make_shared<Actor>("PlayerAttackCollision", 5, position + front + glm::vec3(0, 1, 0), glm::vec3(0), glm::vec3(radian));
+					const glm::vec3 front = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0)) * glm::vec4(0, 0, 0.5f, 1);
+					attackCollision = std::make_shared<Actor>("EnemyAttackCollision", 1, position + front + glm::vec3(0, 1, 0), glm::vec3(0), glm::vec3(radian));
 					attackCollision->colLocal = Collision::CreateSphere(glm::vec3(0), radian);
 				}
 			}
+
 			else {
 				attackCollision.reset();
 			}
 			if (GetMesh()->IsFinished()) {
+				nowAttack = false;
 				attackCollision.reset();
 				GetMesh()->Play("Idle");
 				state = State::idle;
+				nowAction = 0;
 			}
 			break;
 		}
@@ -133,7 +162,6 @@ void EnemyActor::Update(float deltaTime)
 
 /*
 衝突ハンドラ
-
 @param b 衝突判定のアクター
 @param p 衝突が発生した座標
 */
@@ -166,19 +194,17 @@ void EnemyActor::OnHit(const ActorPtr& b, const glm::vec3& p)
 	}
 }
 
+
 /*
 攻撃操作を処理する
-
-@param gamepad ゲームパッド入力
 */
-void EnemyActor::CheckAttack()
+void EnemyActor::Attack()
 {
-	if (isInAir) {
-		return;
-	}
-	if (1) {
-		GetMesh()->Play("Attack", false);
-		state = State::attack;
+	if (!attackCollision) {
+			nowAttack = true;
+			GetMesh()->Play("Attack", false);
+			attackTimer = 0.0f;
+			state = State::attack;
 	}
 }
 
@@ -197,37 +223,101 @@ void EnemyActor::SetBoardingActor(ActorPtr p)
 }
 
 /*
-移動操作を処理する
-
-@param gamepad  ゲームパッド入力
+移動を処理する
 */
-void EnemyActor::CheckRun()
+void EnemyActor::SRangeAttack()
 {
+	if (nowAction == 1) {
+		probability = rand() % 100;
+		if (probability < 30) {
+			nowAction = 2;
+			nowPosition = position;//現在のエネミーの位置をコピー
+			Feint();
+			return;
+		}
+	}
+	else {
+		Feint();
+		return;
+	}
 	//空中にいる時は移動できない
-	if (isInAir) {
+	/*if (isInAir) {
 		return;
-	}
-
-	//ターゲットへのベクトルを計算
-	glm::vec3 v = TAct->position - position;
-	v.y = 0;
-	
-	float dist = glm::length(v);//ターゲットまでの距離
-	glm::vec3 move = glm::normalize(v);//ターゲットへの単位ベクトル
-
-	if (glm::length(v) <= 3) {
-		velocity = glm::vec3(0);
-		move = glm::normalize(move);
-		rotation.y = std::atan2(-move.z, move.x) + glm::radians(90.0f);
-		return;
-	}
-
-	//死んでいたら移動させない
+	}*/
 	if (dead) {
 		velocity = glm::vec3(0);
+	}
+	else {
+
+
+		//ターゲットへのベクトルを計算
+		glm::vec3 v = TAct->position - position;
+
+		v.y = 0;
+
+		float dist = glm::length(v);//ターゲットまでの距離
+		glm::vec3 move = glm::normalize(v);//ターゲットへの単位ベクトル
+
+		if (!nowAttack) {
+			if (dist <= 2) {
+				Attack();
+				velocity = glm::vec3(0);
+				return;
+			}
+		}
+
+		//移動が行われていたら、移動方向に応じて向きと速度を更新
+		if (glm::dot(move, move)) {
+			//向きを更新
+			move = glm::normalize(move);
+			rotation.y = std::atan2(-move.z, move.x) + glm::radians(90.0f);
+
+			//物体に乗っていないときは地形の勾配を考慮して移動方向を調整する
+			if (!boardingActor) {
+				//移動方向の地形の勾配(gradient)を計算
+				const float minGradient = glm::radians(-60.0f); //沿うことのできる勾配の最小値
+				const float maxGradient = glm::radians(60.0f); //沿うことのできる勾配の最大値
+				const float frontY =
+					heightMap->Height(position + move * 0.05f) - position.y - 0.01f;
+				const float gradient =
+					glm::clamp(std::atan2(frontY, 0.05f), minGradient, maxGradient);
+
+				//地形に沿うように移動速度を設定
+				const glm::vec3 axis = glm::normalize(glm::cross(move, glm::vec3(0, 1, 0)));
+				move = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
+
+			}
+			velocity = move * moveSpeed;
+		}
+		else {
+			//移動していないので速度を0にする
+			velocity = glm::vec3(0);
+		}
+	}
+}
+
+void EnemyActor::Feint() {
+	
+	if (!onlyOnce) {
+		ver = rand() % 10 - 5;
+
+		hor = rand() % 10 - 5;
+
+		onlyOnce = true;
+	    thisPos = nowPosition-glm::vec3(ver, 0, hor);
+		 //thisPos.y = 0;
+	}
+	glm::vec3 v =thisPos - position;
+	v.y = 0;
+	float dist = glm::length(v);//移動先の距離
+	glm::vec3 move = glm::normalize(v);//移動先への単位ベクトル
+
+	if (dist<= 1) {
+		nowAction = 0;
+		onlyOnce = false;
+		printf("フェイント！");
 		return;
 	}
-
 	//移動が行われていたら、移動方向に応じて向きと速度を更新
 	if (glm::dot(move, move)) {
 		//向きを更新
@@ -249,7 +339,7 @@ void EnemyActor::CheckRun()
 			move = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
 
 		}
-		velocity = move * moveSpeed;
+		velocity = move * feintSpped;
 	}
 	else {
 		//移動していないので速度を0にする

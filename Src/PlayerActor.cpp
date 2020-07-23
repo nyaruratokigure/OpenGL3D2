@@ -15,7 +15,7 @@
 */
 PlayerActor::PlayerActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 	const glm::vec3& pos, const glm::vec3& rot)
-	 : SkeletalMeshActor(buffer.GetSkeletalMesh("Bikuni"), "Player", 13, pos, rot),
+	 : SkeletalMeshActor(buffer.GetSkeletalMesh("Bikuni"), "Player", 3, pos, rot),
 	heightMap(hm)
 {
 	colLocal = Collision::CreateSphere(glm::vec3(0, 0.7f, 0), 0.7f);
@@ -63,63 +63,65 @@ void PlayerActor::Update(float deltaTime)
 		}
 	}
 
-	//アニメーションの更新
-	switch (state) {
-	case State::run:
-		if (isInAir) {
-			GetMesh()->Play("Jump");
-			state = State::jump;
-		}
-		else {
-			const float horizontalSpeed = velocity.x*velocity.x + velocity.z*velocity.z;
-			if (horizontalSpeed == 0) {
+	if (!dead) {
+		//アニメーションの更新
+		switch (state) {
+		case State::run:
+			if (isInAir) {
+				GetMesh()->Play("Jump");
+				state = State::jump;
+			}
+			else {
+				const float horizontalSpeed = velocity.x*velocity.x + velocity.z*velocity.z;
+				if (horizontalSpeed == 0) {
+					GetMesh()->Play("Idle");
+					state = State::idle;
+				}
+			}
+			break;
+
+
+		case State::idle:
+			if (isInAir) {
+				GetMesh()->Play("Jump");
+				state = State::jump;
+			}
+			else {
+				const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
+				if (horizontalSpeed != 0) {
+					GetMesh()->Play("Run");
+					state = State::run;
+				}
+			}
+			break;
+
+		case State::jump:
+			if (!isInAir) {
 				GetMesh()->Play("Idle");
 				state = State::idle;
 			}
-		}
-		break;
+			break;
 
-
-	case State::idle:
-		if (isInAir) {
-			GetMesh()->Play("Jump");
-			state = State::jump;
-		}
-		else {
-			const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
-			if (horizontalSpeed != 0) {
-				GetMesh()->Play("Run");
-				state = State::run;
+		case State::attack:
+			attackTimer += deltaTime;
+			if (attackTimer > 0.05f && attackTimer < 1.50f) {
+				if (!attackCollision) {
+					static const float radian = 1.0f;
+					const glm::vec3 front = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0)) * glm::vec4(0, 0, 1.5f, 1);
+					attackCollision = std::make_shared<Actor>("PlayerAttackCollision", 1, position + front + glm::vec3(0, 1, 0), glm::vec3(0), glm::vec3(radian));
+					attackCollision->colLocal = Collision::CreateSphere(glm::vec3(0), radian);
+				}
 			}
-		}
-		break;
-
-	case State::jump:
-		if (!isInAir) {
-			GetMesh()->Play("Idle");
-			state = State::idle;
-		}
-		break;
-
-	case State::attack:
-		attackTimer += deltaTime;
-		if (attackTimer > 0.05f && attackTimer < 0.6f) {
-			if (!attackCollision) {
-				static const float radian = 1.0f;
-				const glm::vec3 front = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0)) * glm::vec4(0, 0, 1.5f, 1);
-				attackCollision = std::make_shared<Actor>("PlayerAttackCollision", 5, position + front + glm::vec3(0, 1, 0), glm::vec3(0), glm::vec3(radian));
-				attackCollision->colLocal = Collision::CreateSphere(glm::vec3(0), radian);
+			else {
+				attackCollision.reset();
 			}
+			if (GetMesh()->IsFinished()) {
+				attackCollision.reset();
+				GetMesh()->Play("Idle");
+				state = State::idle;
+			}
+			break;
 		}
-		else {
-			attackCollision.reset();
-		}
-		if (GetMesh()->IsFinished()) {
-			attackCollision.reset();
-			GetMesh()->Play("Idle");
-			state = State::idle;
-		}
-		break;
 	}
 }
 
@@ -176,10 +178,16 @@ void PlayerActor::CheckAttack(const GamePad& gamepad)
 	if (isInAir) {
 		return;
 	}
+	if (dead) {
+		return;
+	}
+	
 	if (gamepad.buttonDown & GamePad::A) {
-		GetMesh()->Play("Attack.Light", false);
-		attackTimer = 0;
-		state = State::attack;
+		if (!attackCollision) {
+			GetMesh()->Play("Attack.Light", false);
+			attackTimer = 0;
+			state = State::attack;
+		}
 	}
 }
 
@@ -188,6 +196,9 @@ void PlayerActor::CheckAttack(const GamePad& gamepad)
 */
 void PlayerActor::ProcessInput()
 {
+	if (dead) {
+		return;
+	}
 	const GamePad gamepad = GLFWEW::Window::Instance().GetGamePad();
 	CheckRun(gamepad);
 	CheckJump(gamepad);
@@ -219,49 +230,58 @@ void PlayerActor::CheckRun(const GamePad& gamepad)
 		return;
 	}
 
-	//方向キーから移動方向を計算
-	const glm::vec3 front(0, 0, -1);
-	const glm::vec3 left(-1, 0, 0);
-	glm::vec3 move(0);
-	if (gamepad.buttons & GamePad::DPAD_UP) {
-		move += front;
-	}
-	else if (gamepad.buttons & GamePad::DPAD_DOWN) {
-		move -= front;
-	}
-	if (gamepad.buttons & GamePad::DPAD_LEFT) {
-		move += left;
-	}
-	else if (gamepad.buttons & GamePad::DPAD_RIGHT) {
-		move -= left;
-	}
-
-	//移動が行われていたら、移動方向に応じて向きと速度を更新
-	if (glm::dot(move, move)) {
-		//向きを更新
-		move = glm::normalize(move);
-		rotation.y = std::atan2(-move.z, move.x) + glm::radians(90.0f);
-
-		//物体に乗っていないときは地形の勾配を考慮して移動方向を調整する
-		if (!boardingActor) {
-			//移動方向の地形の勾配(gradient)を計算
-			const float minGradient = glm::radians(-60.0f); //沿うことのできる勾配の最小値
-			const float maxGradient = glm::radians(60.0f); //沿うことのできる勾配の最大値
-			const float frontY =
-				heightMap->Height(position + move * 0.05f) - position.y - 0.01f;
-			const float gradient =
-				glm::clamp(std::atan2(frontY, 0.05f), minGradient, maxGradient);
-
-			//地形に沿うように移動速度を設定
-			const glm::vec3 axis = glm::normalize(glm::cross(move, glm::vec3(0, 1, 0)));
-			move = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
-
-		}
-		velocity = move * moveSpeed;
+	//死んでいたら移動させない
+	if (dead) {
+		velocity = glm::vec3(0);
 	}
 	else {
-		    //移動していないので速度を0にする
+
+		//方向キーから移動方向を計算
+		const glm::vec3 front(0, 0, -1);
+		const glm::vec3 left(-1, 0, 0);
+		glm::vec3 move(0);
+		if (gamepad.buttons & GamePad::DPAD_UP) {
+			move += front;
+		}
+		else if (gamepad.buttons & GamePad::DPAD_DOWN) {
+			move -= front;
+		}
+		if (gamepad.buttons & GamePad::DPAD_LEFT) {
+			move += left;
+		}
+		else if (gamepad.buttons & GamePad::DPAD_RIGHT) {
+			move -= left;
+		}
+
+
+
+		//移動が行われていたら、移動方向に応じて向きと速度を更新
+		if (glm::dot(move, move)) {
+			//向きを更新
+			move = glm::normalize(move);
+			rotation.y = std::atan2(-move.z, move.x) + glm::radians(90.0f);
+
+			//物体に乗っていないときは地形の勾配を考慮して移動方向を調整する
+			if (!boardingActor) {
+				//移動方向の地形の勾配(gradient)を計算
+				const float minGradient = glm::radians(-60.0f); //沿うことのできる勾配の最小値
+				const float maxGradient = glm::radians(60.0f); //沿うことのできる勾配の最大値
+				const float frontY =
+					heightMap->Height(position + move * 0.05f) - position.y - 0.01f;
+				const float gradient =
+					glm::clamp(std::atan2(frontY, 0.05f), minGradient, maxGradient);
+
+				//地形に沿うように移動速度を設定
+				const glm::vec3 axis = glm::normalize(glm::cross(move, glm::vec3(0, 1, 0)));
+				move = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
+
+			}
+			velocity = move * moveSpeed;
+		}
+		else {
+			//移動していないので速度を0にする
 			velocity = glm::vec3(0);
+		}
 	}
 }
 
