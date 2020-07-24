@@ -14,7 +14,7 @@ bool GameOverScene::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/Title.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/GameoverBg.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -37,8 +37,7 @@ void GameOverScene::ProcessInput()
 	/*if (window.GetGamePad().buttonDown& GamePad::START) {
 		SceneStack::Instance().Replace(std::make_shared<TitleScene>());
 	}*/
-	if (timer <= 0 && (window.GetGamePad().buttonDown & GamePad::START)) {
-		Audio::Engine::Instance().Prepare("Res/Audio/select.mp3")->Play();
+	if (timer>1.0f&&(window.GetGamePad().buttonDown & GamePad::START)) {
 		timer = 1.0f;
 	}
 }
@@ -60,8 +59,8 @@ void GameOverScene::Update(float deltaTime)
 	const float h = window.Height();
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
-	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"ゲームオーバー画面");
-	fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
+	//fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"ゲームオーバー画面");
+	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();
 	//シーン切り替え待ち
 	if (timer > 0) {

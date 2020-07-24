@@ -28,26 +28,31 @@ EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 +*/
 void EnemyActor::Update(float deltaTime)
 {
+	if (dead) {
+		velocity = glm::vec3(0);
+		return;
+	}
+
+	if (nowAction == 0) {
+		actionTimer = 0;
+	}
 	actionTimer -= deltaTime;
-	if (actionTimer<0) {
+	if (actionTimer<=0) {
 		probability = rand() % 100;
-		if (probability < 70) {
+		if (probability > 30) {
 			actionTimer = 3;
 			nowAction = 1;
 			SRangeAttack();
-			
-			return;
 		}
 		else {
-			actionTimer = 2;
+			actionTimer = 0.5;
 			nowAction = 2;
 			nowPosition = position;//現在のエネミーの位置をコピー
 			Feint();
-			return;
 		}
 	}
 	else {
-		if (nowAction = 1) {
+		if (nowAction == 1) {
 			SRangeAttack();
 		}
 		else {
@@ -223,99 +228,73 @@ void EnemyActor::SetBoardingActor(ActorPtr p)
 }
 
 /*
-移動を処理する
+近接攻撃を処理する
 */
 void EnemyActor::SRangeAttack()
 {
-	if (nowAction == 1) {
-		probability = rand() % 100;
-		if (probability < 30) {
-			nowAction = 2;
-			nowPosition = position;//現在のエネミーの位置をコピー
-			Feint();
+	//ターゲットへのベクトルを計算
+	glm::vec3 v = TAct->position - position;
+
+	v.y = 0;
+
+	float dist = glm::length(v);//ターゲットまでの距離
+	glm::vec3 move = glm::normalize(v);//ターゲットへの単位ベクトル
+
+	if (!nowAttack) {
+		if (dist <= 2) {
+			Attack();
+			velocity = glm::vec3(0);
 			return;
 		}
 	}
-	else {
-		Feint();
-		return;
+
+	//移動が行われていたら、移動方向に応じて向きと速度を更新
+	if (glm::dot(move, move)) {
+		//向きを更新
+		move = glm::normalize(move);
+		rotation.y = std::atan2(-move.z, move.x) + glm::radians(90.0f);
+
+		//物体に乗っていないときは地形の勾配を考慮して移動方向を調整する
+		if (!boardingActor) {
+			//移動方向の地形の勾配(gradient)を計算
+			const float minGradient = glm::radians(-60.0f); //沿うことのできる勾配の最小値
+			const float maxGradient = glm::radians(60.0f); //沿うことのできる勾配の最大値
+			const float frontY =
+				heightMap->Height(position + move * 0.05f) - position.y - 0.01f;
+			const float gradient =
+				glm::clamp(std::atan2(frontY, 0.05f), minGradient, maxGradient);
+
+			//地形に沿うように移動速度を設定
+			const glm::vec3 axis = glm::normalize(glm::cross(move, glm::vec3(0, 1, 0)));
+			move = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
+
+		}
+		velocity = move * moveSpeed;
 	}
-	//空中にいる時は移動できない
-	/*if (isInAir) {
-		return;
-	}*/
-	if (dead) {
+	else {
+		//移動していないので速度を0にする
 		velocity = glm::vec3(0);
-	}
-	else {
-
-
-		//ターゲットへのベクトルを計算
-		glm::vec3 v = TAct->position - position;
-
-		v.y = 0;
-
-		float dist = glm::length(v);//ターゲットまでの距離
-		glm::vec3 move = glm::normalize(v);//ターゲットへの単位ベクトル
-
-		if (!nowAttack) {
-			if (dist <= 2) {
-				Attack();
-				velocity = glm::vec3(0);
-				return;
-			}
-		}
-
-		//移動が行われていたら、移動方向に応じて向きと速度を更新
-		if (glm::dot(move, move)) {
-			//向きを更新
-			move = glm::normalize(move);
-			rotation.y = std::atan2(-move.z, move.x) + glm::radians(90.0f);
-
-			//物体に乗っていないときは地形の勾配を考慮して移動方向を調整する
-			if (!boardingActor) {
-				//移動方向の地形の勾配(gradient)を計算
-				const float minGradient = glm::radians(-60.0f); //沿うことのできる勾配の最小値
-				const float maxGradient = glm::radians(60.0f); //沿うことのできる勾配の最大値
-				const float frontY =
-					heightMap->Height(position + move * 0.05f) - position.y - 0.01f;
-				const float gradient =
-					glm::clamp(std::atan2(frontY, 0.05f), minGradient, maxGradient);
-
-				//地形に沿うように移動速度を設定
-				const glm::vec3 axis = glm::normalize(glm::cross(move, glm::vec3(0, 1, 0)));
-				move = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
-
-			}
-			velocity = move * moveSpeed;
-		}
-		else {
-			//移動していないので速度を0にする
-			velocity = glm::vec3(0);
-		}
 	}
 }
 
 void EnemyActor::Feint() {
-	
 	if (!onlyOnce) {
-		ver = rand() % 10 - 5;
-
-		hor = rand() % 10 - 5;
+		ver = rand() % 15 - 7.5;
+		hor = rand() % 15 - 7.5;
 
 		onlyOnce = true;
-	    thisPos = nowPosition-glm::vec3(ver, 0, hor);
-		 //thisPos.y = 0;
+		thisPos = nowPosition - glm::vec3(ver, 0, hor);
 	}
+
 	glm::vec3 v =thisPos - position;
 	v.y = 0;
 	float dist = glm::length(v);//移動先の距離
 	glm::vec3 move = glm::normalize(v);//移動先への単位ベクトル
 
 	if (dist<= 1) {
-		nowAction = 0;
 		onlyOnce = false;
-		printf("フェイント！");
+		nowAction = 0;
+		printf("フェイント終わり！");
 		return;
 	}
 	//移動が行われていたら、移動方向に応じて向きと速度を更新

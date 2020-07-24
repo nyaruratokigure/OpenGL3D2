@@ -26,8 +26,7 @@ PlayerActor::PlayerActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffe
 更新
 @param deltaTime 経過時間
 +*/
-void PlayerActor::Update(float deltaTime)
-{
+void PlayerActor::Update(float deltaTime){
 	//座標の更新.
 	SkeletalMeshActor::Update(deltaTime);
 	if (attackCollision) {
@@ -63,8 +62,8 @@ void PlayerActor::Update(float deltaTime)
 		}
 	}
 
-	if (!dead) {
-		//アニメーションの更新
+	//アニメーションの更新
+	if(!dead){
 		switch (state) {
 		case State::run:
 			if (isInAir) {
@@ -178,10 +177,6 @@ void PlayerActor::CheckAttack(const GamePad& gamepad)
 	if (isInAir) {
 		return;
 	}
-	if (dead) {
-		return;
-	}
-	
 	if (gamepad.buttonDown & GamePad::A) {
 		if (!attackCollision) {
 			GetMesh()->Play("Attack.Light", false);
@@ -196,7 +191,8 @@ void PlayerActor::CheckAttack(const GamePad& gamepad)
 */
 void PlayerActor::ProcessInput()
 {
-	if (dead) {
+ 	if (dead) {
+		velocity = glm::vec3(0);
 		return;
 	}
 	const GamePad gamepad = GLFWEW::Window::Instance().GetGamePad();
@@ -228,11 +224,6 @@ void PlayerActor::CheckRun(const GamePad& gamepad)
 	//空中にいる時は移動できない
 	if (isInAir) {
 		return;
-	}
-
-	//死んでいたら移動させない
-	if (dead) {
-		velocity = glm::vec3(0);
 	}
 	else {
 

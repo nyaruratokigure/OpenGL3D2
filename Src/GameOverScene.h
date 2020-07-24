@@ -28,6 +28,6 @@ private:
 	SpriteRenderer spriteRenderer;
 	FontRenderer fontRenderer;
 	Audio::SoundPtr bgm;
-	float timer = 0;
+	float timer = 5;
 };
 #endif // GAMEOVERSCENE_H_INCLUDED

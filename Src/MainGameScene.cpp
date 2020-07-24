@@ -5,7 +5,7 @@
 #include "TitleScene.h"
 #include "StatusScene.h"
 #include "GameOverScene.h"
-#include "Clear.h"
+#include "ClearScene.h"
 #include "GLFWEW.h"
 #include "SkeletalMeshActor.h"
 #include "EventScene.h"
@@ -170,7 +170,7 @@ bool MainGameScene::Initialize()
 	if (!heightMap.CreateMesh(meshBuffer, "Terrain")) {
 		return false;
 	}
-	if (!heightMap.CreateWaterMesh(meshBuffer, "Water", -3)) { //水面の高さ
+	if (!heightMap.CreateWaterMesh(meshBuffer, "Water", -1)) { //水面の高さ
 		return false;
 	}
 
@@ -415,9 +415,11 @@ void MainGameScene::Update(float deltaTime)
 				bb->health = 1;
 				
 				bb->Dead();
+				Audio::Engine::Instance().Prepare("Res/Audio/EnemyDead.wav")->Play();
 				bb->GetMesh()->Play("Down", false);//敵の死亡時のアニメーション
 			}
 			else {
+				Audio::Engine::Instance().Prepare("Res/Audio/PlayerAttack.wav")->Play();
 				bb->GetMesh()->Play("Hit", false);//敵がダメージを受けた際のアニメーション
 			}
 			hit = true;
@@ -456,9 +458,11 @@ void MainGameScene::Update(float deltaTime)
 					bb->colLocal = Collision::Shape{};
 
 					bb->Dead();
+					Audio::Engine::Instance().Prepare("Res/Audio/PlayerDead.wav")->Play();
 					bb->GetMesh()->Play("Down", false);//プレイヤーの死亡時のアニメーション
 				}
 				else {
+					Audio::Engine::Instance().Prepare("Res/Audio/EnemyAttack.wav")->Play();
 					bb->GetMesh()->Play("Hit", false);//プレイヤーがダメージを受けた際のアニメーション
 				}
 				hit = true;
@@ -468,7 +472,13 @@ void MainGameScene::Update(float deltaTime)
 				EnemyAttackCollision->health = 0;
 			}
 		}
+	}
+	if (-2 > player->position.y)
+	{
 
+		player->health = 0;
+		player->Dead();
+		player->GetMesh()->Play("Down", false);//プレイヤーの死亡時のアニメーション
 	}
 	////死亡アニメーションの終わった敵を消す
 	//for (auto& e : enemies) {
@@ -528,7 +538,7 @@ void MainGameScene::Update(float deltaTime)
 		achivements[2] &&
 		achivements[3] ==true) {
 		bgm->Stop();
-		SceneStack::Instance().Replace(std::make_shared<Clear>());
+		SceneStack::Instance().Replace(std::make_shared<ClearScene>());
 		return;
 	}
 	if (player->dead == true) {
@@ -556,15 +566,20 @@ void MainGameScene::Update(float deltaTime)
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
 
-	std::wstringstream ss1,ss2,ss3;
+	std::wstringstream ss1,ss2,ss3,ss4;
 	ss1 << L"未開放地蔵:" << jizoCount;
 	fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), ss1.str().c_str());
 	ss2 << L"HP:" << player->health;
 	fontRenderer.AddString(glm::vec2(w * 0.4f +20, h * 0.5f - lineHeight), ss2.str().c_str());
 	/*if (enep) {
-		ss3 << L"NA:" << enep->nowAction;
+		ss3 << L"デバッグ用:" << enep->nowAction;
 		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
+	}
+	if (enep) {
+		ss4 << L"デバッグ用:" << enep->actionTimer;
+		fontRenderer.AddString(glm::vec2(-w * 0.25f + 20, h * 0.5f - lineHeight), ss4.str().c_str());
 	}*/
+	
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();
 
@@ -826,10 +841,10 @@ void MainGameScene::Camera::Update(const glm::mat4& matView)
 */
 void MainGameScene::RenderMesh(Mesh::DrawType drawType)
 {
-	glm::vec3 cubePos(100, 0, 100);
+	/*glm::vec3 cubePos(100, 0, 100);
 	cubePos.y = heightMap.Height(cubePos);
 	const glm::mat4 matModel = glm::translate(glm::mat4(1), cubePos);
-	Mesh::Draw(meshBuffer.GetFile("Cube"), matModel,drawType);
+	Mesh::Draw(meshBuffer.GetFile("Cube"), matModel,drawType);*/
 	Mesh::Draw(meshBuffer.GetFile("Terrain"), glm::mat4(1),drawType);
 
 	player->Draw(drawType);

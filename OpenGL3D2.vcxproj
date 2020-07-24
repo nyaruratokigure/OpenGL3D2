@@ -154,7 +154,7 @@
     <ClInclude Include="Src\Actor.h" />
     <ClInclude Include="Src\Audio\Audio.h" />
     <ClInclude Include="Src\BufferObject.h" />
-    <ClInclude Include="Src\Clear.h" />
+    <ClInclude Include="Src\ClearScene.h" />
     <ClInclude Include="Src\Collision.h" />
     <ClInclude Include="Src\EnemyActor.h" />
     <ClInclude Include="Src\EventScene.h" />
@@ -191,7 +191,7 @@
     <ClCompile Include="Src\Actor.cpp" />
     <ClCompile Include="Src\Audio\Audio.cpp" />
     <ClCompile Include="Src\BufferObject.cpp" />
-    <ClCompile Include="Src\Clear.cpp" />
+    <ClCompile Include="Src\ClearScene.cpp" />
     <ClCompile Include="Src\Collision.cpp" />
     <ClCompile Include="Src\EnemyActor.cpp" />
     <ClCompile Include="Src\EventScene.cpp" />

@@ -14,7 +14,7 @@ bool TitleScene::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/Title.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/TitleBg.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -59,7 +59,7 @@ void TitleScene::Update(float deltaTime)
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
 	//fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"ƒ^ƒCƒgƒ‹‰æ–Ê");
-	fontRenderer.AddString(glm::vec2(-150, -125), L"P  r  e  s  s   A  n  y   K  e  y");
+	fontRenderer.AddString(glm::vec2(-175, -125), L"P  r  e  s  s   E  n  t  e  r   K  e  y");
 	fontRenderer.EndUpdate(); 
 
 	fontTimer -= deltaTime;
