@@ -224,8 +224,8 @@ bool MainGameScene::Initialize()
 	//お地蔵様を配置
 	for (int i = 0; i < 4; ++i) {
 		glm::vec3 position(0);
-		position.x = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(90,110)(rand));
-		position.z = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(90,110)(rand));
+		position.x = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(85,115)(rand));
+		position.z = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(85,115)(rand));
 		position.y = heightMap.Height(position);
 		glm::vec3 rotation(0);
 		rotation.y = std::uniform_real_distribution<float>(0.0f, 3.14f * 2.0f)(rand);
@@ -290,14 +290,14 @@ bool MainGameScene::Initialize()
 
 	//パーティクル・システムのテスト用にエミッターを追加
 	{
-		//エミッター1個目
-		for (auto p : objects) {
+		//地蔵用パーティクル
+		for (auto o : objects) {
 			ParticleEmitterParameter ep;
 			
 			ep.id = particleID;
 			ep.imagePath = "Res/Mist.tga";
 			ep.tiles = glm::ivec2(2, 2);
-			ep.position = p->position;
+			ep.position = o->position;
 			//ep.position = glm::vec3(96.5f, 0, 95);
 			ep.position.y = heightMap.Height(ep.position);
 			ep.emissionsPerSecond = 20.0f;
@@ -310,20 +310,7 @@ bool MainGameScene::Initialize()
 			++particleID;
 		}
 	}
-	//{
-	//	//エミッター2個目
-	//	ParticleEmitterParameter ep;
-	//	ep.imagePath = "Res/DiskParticle.tga";
-	//	ep.position = glm::vec3(97, 0, 100);
-	//	ep.position.y = heightMap.Height(ep.position);
-	//	ep.angle = glm::radians(30.0f);
-	//	ParticleParameter pp;
-	//	pp.lifetime = 2;
-	//	pp.scale = glm::vec2(0.2f);
-	//	pp.velocity = glm::vec3(0, 3, 0);
-	//	pp.color = glm::vec4(0.1f, 0.3f, 0.8f, 1.0f);
-	//	particleSystem.Add(ep, pp);
-	//}
+	
 	//{
 	//	//エミッター3個目
 	//	ParticleEmitterParameter ep;
@@ -352,29 +339,29 @@ void MainGameScene::ProcessInput()
 	//プレイヤー操作
 	player->ProcessInput();
 
-	if (!flag) {
+	//if (!flag) {
 
-		//GLFWEW::Window& window = GLFWEW::Window::Instance();
-		/*if (window.GetGamePad().buttonDown& GamePad::START) {
-			flag = true;
-			SceneStack::Instance().Push(std::make_shared<StatusScene>());
-		}*/
-		if (timer <= 0 && (window.GetGamePad().buttonDown & GamePad::START)) {
-			/*Audio::Engine::Instance().Prepare("Res/Audio/Start.wav")->Play();
-			timer = 1.0f;*/
-			if (window.GetGamePad().buttonDown& GamePad::START) {
-				bgm->Stop();
-				SceneStack::Instance().Replace(std::make_shared<GameOverScene>());
-			}
-		}
-		else {
-			//GLFWEW::Window& window = GLFWEW::Window::Instance();
-			if (window.GetGamePad().buttonDown& GamePad::START) {
-				bgm->Stop();
-				SceneStack::Instance().Replace(std::make_shared<GameOverScene>());
-			}
-		}
-	}
+	//	//GLFWEW::Window& window = GLFWEW::Window::Instance();
+	//	/*if (window.GetGamePad().buttonDown& GamePad::START) {
+	//		flag = true;
+	//		SceneStack::Instance().Push(std::make_shared<StatusScene>());
+	//	}*/
+	//	if (timer <= 0 && (window.GetGamePad().buttonDown & GamePad::START)) {
+	//		/*Audio::Engine::Instance().Prepare("Res/Audio/Start.wav")->Play();
+	//		timer = 1.0f;*/
+	//		if (window.GetGamePad().buttonDown& GamePad::START) {
+	//			bgm->Stop();
+	//			SceneStack::Instance().Replace(std::make_shared<GameOverScene>());
+	//		}
+	//	}
+	//	else {
+	//		//GLFWEW::Window& window = GLFWEW::Window::Instance();
+	//		if (window.GetGamePad().buttonDown& GamePad::START) {
+	//			bgm->Stop();
+	//			SceneStack::Instance().Replace(std::make_shared<GameOverScene>());
+	//		}
+	//	}
+	//}
 	
 }
 /*
@@ -412,6 +399,7 @@ void MainGameScene::Update(float deltaTime)
 			bb->health -= a->health;
 			if (bb->health <= 0) {
 				bb->colLocal = Collision::Shape{};
+				hitEffect = true;
 				bb->health = 1;
 				
 				bb->Dead();
@@ -419,8 +407,10 @@ void MainGameScene::Update(float deltaTime)
 				bb->GetMesh()->Play("Down", false);//敵の死亡時のアニメーション
 			}
 			else {
+				hitEffect = true;
 				Audio::Engine::Instance().Prepare("Res/Audio/PlayerAttack.wav")->Play();
 				bb->GetMesh()->Play("Hit", false);//敵がダメージを受けた際のアニメーション
+				bb->Damage();
 			}
 			hit = true;
 			}
@@ -428,6 +418,7 @@ void MainGameScene::Update(float deltaTime)
 		if (hit) {
 			PlayerAttackCollision->health = 0;
 		}
+		hitEffect = false;
 	}
 	//死亡アニメーションの終わった敵を消す
 	for (ActorPtr e : enemies) {
@@ -456,12 +447,13 @@ void MainGameScene::Update(float deltaTime)
 				bb->health -= a->health;
 				if (bb->health <= 0) {
 					bb->colLocal = Collision::Shape{};
-
+					hitEffect = true;
 					bb->Dead();
 					Audio::Engine::Instance().Prepare("Res/Audio/PlayerDead.wav")->Play();
 					bb->GetMesh()->Play("Down", false);//プレイヤーの死亡時のアニメーション
 				}
 				else {
+					hitEffect = true;
 					Audio::Engine::Instance().Prepare("Res/Audio/EnemyAttack.wav")->Play();
 					bb->GetMesh()->Play("Hit", false);//プレイヤーがダメージを受けた際のアニメーション
 				}
@@ -471,6 +463,7 @@ void MainGameScene::Update(float deltaTime)
 			if (hit) {
 				EnemyAttackCollision->health = 0;
 			}
+			hitEffect = false;
 		}
 	}
 	if (-2 > player->position.y)
@@ -478,21 +471,30 @@ void MainGameScene::Update(float deltaTime)
 
 		player->health = 0;
 		player->Dead();
+		Audio::Engine::Instance().Prepare("Res/Audio/PlayerDead.wav")->Play();
 		player->GetMesh()->Play("Down", false);//プレイヤーの死亡時のアニメーション
 	}
-	////死亡アニメーションの終わった敵を消す
-	//for (auto& e : enemies) {
-	//	SkeletalMeshActorPtr enemy = std::static_pointer_cast<SkeletalMeshActor>(e);
-	//	Mesh::SkeletalMeshPtr mesh = enemy->GetMesh();
-	//	if (mesh->IsFinished()) {
-	//		if (mesh->GetAnimation() == "Down") {
-	//			enemy->health = 0;
-	//		}
-	//		else {
-	//			mesh->Play("Wait");
-	//		}
-	//	}
-	//}
+
+	for (auto e : enemies) {
+		if (hitEffect) {
+			//エミッター2個目
+			ParticleEmitterParameter ep;
+			ep.imagePath = "Res/FireParticle.tga";
+			ep.position = e->position;
+			ep.position.y += 0.8f;
+			ep.angle = glm::radians(90.0f);
+			ep.emissionsPerSecond = 50.0f;	//秒あたりのパーティクル放出数
+			ep.radius = 1.0f;				//放出方向を定義する円錐の半径
+			ep.gravity = 0.0f;				//パーティクルにかかる重力
+			ep.loop = false;
+			ParticleParameter pp;
+			pp.lifetime = 1;
+			pp.scale = glm::vec2(1.0f);
+			pp.velocity = e->rotation;
+			pp.color = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+			particleSystem.Add(ep, pp);
+		}
+	}
 
 	//ライトの更新
 	glm::vec3 ambientColor(0.1f, 0.05f, 0.15f);
@@ -533,6 +535,7 @@ void MainGameScene::Update(float deltaTime)
 		}
 	}
 
+
 	if (achivements[0] &&
 		achivements[1] &&
 		achivements[2] &&
@@ -571,14 +574,14 @@ void MainGameScene::Update(float deltaTime)
 	fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), ss1.str().c_str());
 	ss2 << L"HP:" << player->health;
 	fontRenderer.AddString(glm::vec2(w * 0.4f +20, h * 0.5f - lineHeight), ss2.str().c_str());
-	/*if (enep) {
+	if (enep) {
 		ss3 << L"デバッグ用:" << enep->nowAction;
 		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
 	}
 	if (enep) {
 		ss4 << L"デバッグ用:" << enep->actionTimer;
 		fontRenderer.AddString(glm::vec2(-w * 0.25f + 20, h * 0.5f - lineHeight), ss4.str().c_str());
-	}*/
+	}
 	
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();

@@ -39,6 +39,7 @@ public:
 
 private: 
 	void RenderMesh(Mesh::DrawType);
+	bool hitEffect = false;
 	bool flag = false;
 	std::mt19937 rand;
 	int particleID = 0;

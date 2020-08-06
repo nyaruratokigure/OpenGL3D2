@@ -37,31 +37,39 @@ void EnemyActor::Update(float deltaTime)
 		actionTimer = 0;
 	}
 	actionTimer -= deltaTime;
-	if (actionTimer<=0) {
-		probability = rand() % 100;
-		if (probability > 30) {
-			actionTimer = 3;
-			nowAction = 1;
-			SRangeAttack();
+	if (nowAction==0,1,2) {
+		if (actionTimer <= 0) {
+			float dist = PlayerDist();
+			probability = rand() % 100;
+			if (probability > 30) {
+				actionTimer = 3;
+				nowAction = 1;
+				Move();
+			}
+			else {
+				actionTimer = 0.5;
+				nowAction = 2;
+				nowPosition = position;//現在のエネミーの位置をコピー
+				Feint();
+			}
 		}
-		else {
-			actionTimer = 0.5;
-			nowAction = 2;
-			nowPosition = position;//現在のエネミーの位置をコピー
-			Feint();
-		}
+	}
+	
+	if (nowAction == 1) {
+		Move();
+	}
+	else if (nowAction == 2) {
+		Feint();
+	}
+	/*else if (nowAction == 3) {
+		Attack();
 	}
 	else {
-		if (nowAction == 1) {
-			SRangeAttack();
-		}
-		else {
-			Feint();
-		}
-	}
+		Damage();
+	}*/
 
 
-	//座標の更新.
+	//座標の更新
 	SkeletalMeshActor::Update(deltaTime);
 	if (attackCollision) {
 		attackCollision->Update(deltaTime);
@@ -103,7 +111,8 @@ void EnemyActor::Update(float deltaTime)
 	if (!dead) {
 		//アニメーションの更新
 		switch (state) {
-		case State::run:
+		case State::
+		run:
 			if (isInAir) {
 				GetMesh()->Play("Jump");
 				state = State::jump;
@@ -161,6 +170,20 @@ void EnemyActor::Update(float deltaTime)
 				nowAction = 0;
 			}
 			break;
+		case State::damage:
+			if (GetMesh()->IsFinished()) {
+				const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
+				if (horizontalSpeed != 0) {
+					GetMesh()->Play("Run");
+					state = State::run;
+				}
+				else {
+					GetMesh()->Play("Idle");
+					state = State::idle;
+				}
+				nowAction = 0;
+			}
+			break;
 		}
 	}
 }
@@ -199,6 +222,16 @@ void EnemyActor::OnHit(const ActorPtr& b, const glm::vec3& p)
 	}
 }
 
+float EnemyActor::PlayerDist() {
+	glm::vec3 v = TAct->position - position;
+
+	v.y = 0;
+
+	float dist = glm::length(v);//ターゲットまでの距離
+
+	return dist;
+}
+
 
 /*
 攻撃操作を処理する
@@ -209,6 +242,7 @@ void EnemyActor::Attack()
 			nowAttack = true;
 			GetMesh()->Play("Attack", false);
 			attackTimer = 0.0f;
+			velocity = glm::vec3(0);
 			state = State::attack;
 	}
 }
@@ -228,9 +262,9 @@ void EnemyActor::SetBoardingActor(ActorPtr p)
 }
 
 /*
-近接攻撃を処理する
+移動を処理する
 */
-void EnemyActor::SRangeAttack()
+void EnemyActor::Move()
 {
 	//ターゲットへのベクトルを計算
 	glm::vec3 v = TAct->position - position;
@@ -238,12 +272,12 @@ void EnemyActor::SRangeAttack()
 	v.y = 0;
 
 	float dist = glm::length(v);//ターゲットまでの距離
-	glm::vec3 move = glm::normalize(v);//ターゲットへの単位ベクトル
+ 	glm::vec3 move = glm::normalize(v);//ターゲットへの単位ベクトル
 
 	if (!nowAttack) {
 		if (dist <= 2) {
 			Attack();
-			velocity = glm::vec3(0);
+			nowAction = 3;
 			return;
 		}
 	}
@@ -294,7 +328,6 @@ void EnemyActor::Feint() {
 	if (dist<= 1) {
 		onlyOnce = false;
 		nowAction = 0;
-		printf("フェイント終わり！");
 		return;
 	}
 	//移動が行われていたら、移動方向に応じて向きと速度を更新
@@ -324,5 +357,10 @@ void EnemyActor::Feint() {
 		//移動していないので速度を0にする
 		velocity = glm::vec3(0);
 	}
+}
+void EnemyActor::Damage() {
+	nowAction = 4;
+	velocity = glm::vec3(0);
+	state = State::damage;
 }
 

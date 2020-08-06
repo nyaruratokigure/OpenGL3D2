@@ -26,9 +26,13 @@ public:
 	void Dead() {
 		dead = true;
 	}
+	void Damage();
+	float actionTimer = 0.0f;  ///<行動制御用のタイマー
+	int nowAction = 0;         ///<選択中の行動.1通常、2フェイント、3遠距離攻撃
 	
 private:
-	void SRangeAttack();
+	float PlayerDist();
+	void Move();
 	//void CheckJump();
 	void Attack();
 	void Feint();
@@ -39,6 +43,7 @@ private:
 		run,  ///<移動
 		jump, ///<ジャンプ
 		attack, ///< 攻撃
+		damage,///<ダメージを受けた際
 	};
 	State state = State::idle; ///<現在のアニメーション状態
 	bool isInAir = false;      ///<空中判定フラグ
@@ -47,12 +52,12 @@ private:
 	float moveSpeed = 3.0f;    ///<移動速度
 	float feintSpped = 6.0f;   ///<フェイント時の移動速度
 	float attackTimer = 0.0f;  ///<攻撃時間
-	float actionTimer = 0.0f;  ///<行動制御用のタイマー
+	
 	
 	ActorPtr attackCollision;  ///<攻撃判定
 	ActorPtr boardingActor;    ///<乗っているアクター
 	
-	int nowAction = 0;         ///<選択中の行動.1通常、2フェイント、3遠距離攻撃
+
 	int probability = 0;	   ///<確率
 	int ver;
 	int hor;
