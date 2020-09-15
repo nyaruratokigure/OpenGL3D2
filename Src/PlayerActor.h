@@ -24,6 +24,7 @@ public:
 	void ProcessInput();
 	void SetBoardingActor(ActorPtr);
 	const ActorPtr& GetAttackCollision() const { return attackCollision; }
+	void Damage();
 
 	bool dead = false;
 	void Dead() {
@@ -41,6 +42,7 @@ private:
 		run,  ///<移動
 		jump, ///<ジャンプ
 		attack, ///< 攻撃
+		damage,///<ダメージ
 	};
 	State state = State::idle; ///<現在のアニメーション状態
 	bool isInAir = false;      ///<空中判定フラグ

@@ -28,30 +28,32 @@ public:
 	}
 	void Damage();
 	float actionTimer = 0.0f;  ///<行動制御用のタイマー
-	int nowAction = 0;         ///<選択中の行動.1通常、2フェイント、3遠距離攻撃
+	char nowAction = 0;         ///<選択中の行動.1移動、2近接攻撃、3ダメージ、4フェイント
+	bool nowCps = false;
 	
 private:
 	float PlayerDist();
-	void Move();
-	//void CheckJump();
-	void Attack();
-	void Feint();
+	void Move();///<playerの座標に向けて移動する
+	void Attack();///<攻撃する際にMoveから移行する
+	void Feint();///<フェイント、左右と後退りの3パターン
+	void Compensate();///<行動間のenemyの向きを補完する
 
 	/// アニメーション状態
 	enum class State {
 		idle, ///<停止
 		run,  ///<移動
-		jump, ///<ジャンプ
 		attack, ///< 攻撃
 		damage,///<ダメージを受けた際
+		dead,///<死亡時
 	};
 	State state = State::idle; ///<現在のアニメーション状態
 	bool isInAir = false;      ///<空中判定フラグ
 	bool nowAttack = false;	   ///<攻撃中かどうか
 	bool onlyOnce = false;
 	float moveSpeed = 3.0f;    ///<移動速度
-	float feintSpped = 6.0f;   ///<フェイント時の移動速度
+	float feintSpped = 1.0f;   ///<フェイント時の移動速度
 	float attackTimer = 0.0f;  ///<攻撃時間
+	float targetRot;
 	
 	
 	ActorPtr attackCollision;  ///<攻撃判定
@@ -59,10 +61,10 @@ private:
 	
 
 	int probability = 0;	   ///<確率
-	int ver;
-	int hor;
 	glm::vec3 nowPosition;
-	glm::vec3 thisPos;
+	glm::vec3 targetPos;
+	glm::vec3 move;
+	glm::vec3 direction;
 	
 	
 	const Terrain::HeightMap* heightMap = nullptr;

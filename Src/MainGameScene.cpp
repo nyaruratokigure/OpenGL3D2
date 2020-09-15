@@ -456,6 +456,7 @@ void MainGameScene::Update(float deltaTime)
 					hitEffect = true;
 					Audio::Engine::Instance().Prepare("Res/Audio/EnemyAttack.wav")->Play();
 					bb->GetMesh()->Play("Hit", false);//プレイヤーがダメージを受けた際のアニメーション
+					bb->Damage(); bool nowCps = false;
 				}
 				hit = true;
 			}
@@ -575,7 +576,7 @@ void MainGameScene::Update(float deltaTime)
 	ss2 << L"HP:" << player->health;
 	fontRenderer.AddString(glm::vec2(w * 0.4f +20, h * 0.5f - lineHeight), ss2.str().c_str());
 	if (enep) {
-		ss3 << L"デバッグ用:" << enep->nowAction;
+		ss3 << L"デバッグ用:" << enep->nowCps;
 		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
 	}
 	if (enep) {

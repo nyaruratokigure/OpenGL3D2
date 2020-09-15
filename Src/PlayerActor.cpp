@@ -120,6 +120,20 @@ void PlayerActor::Update(float deltaTime){
 				state = State::idle;
 			}
 			break;
+
+		case State::damage:
+			if (GetMesh()->IsFinished()) {
+				const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
+				if (horizontalSpeed != 0) {
+					GetMesh()->Play("Run");
+					state = State::run;
+				}
+				else {
+					GetMesh()->Play("Idle");
+					state = State::idle;
+				}
+			}
+			break;
 		}
 	}
 }
@@ -177,8 +191,10 @@ void PlayerActor::CheckAttack(const GamePad& gamepad)
 	if (isInAir) {
 		return;
 	}
+
 	if (gamepad.buttonDown & GamePad::A) {
 		if (!attackCollision) {
+			//GetMesh()->Play("Attack.Light", false);
 			GetMesh()->Play("Attack.Light", false);
 			attackTimer = 0;
 			state = State::attack;
@@ -195,6 +211,7 @@ void PlayerActor::ProcessInput()
 		velocity = glm::vec3(0);
 		return;
 	}
+
 	const GamePad gamepad = GLFWEW::Window::Instance().GetGamePad();
 	CheckRun(gamepad);
 	CheckJump(gamepad);
@@ -231,6 +248,13 @@ void PlayerActor::CheckRun(const GamePad& gamepad)
 		velocity = glm::vec3(0);
 		return;
 	}
+
+	if (state == State::damage)
+	{
+		velocity = glm::vec3(0);
+		return;
+	}
+
 	//•ûŒüƒL[‚©‚çˆÚ“®•ûŒü‚ğŒvZ
 	const glm::vec3 front(0, 0, -1);
 	const glm::vec3 left(-1, 0, 0);
@@ -292,4 +316,9 @@ void PlayerActor::CheckJump(const GamePad& gamepad)
 	if (gamepad.buttonDown & GamePad::B) {
 		Jump();
 	}
+}
+
+void PlayerActor::Damage() {
+	velocity = glm::vec3(0);
+	state = State::damage;
 }

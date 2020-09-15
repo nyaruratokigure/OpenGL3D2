@@ -35,38 +35,41 @@ void EnemyActor::Update(float deltaTime)
 
 	if (nowAction == 0) {
 		actionTimer = 0;
+		nowCps = true;
 	}
 	actionTimer -= deltaTime;
-	if (nowAction==0,1,2) {
+	if (!nowAction == 2,3) {
 		if (actionTimer <= 0) {
-			float dist = PlayerDist();
+			onlyOnce = false;
+			//float dist = PlayerDist();
 			probability = rand() % 100;
-			if (probability > 30) {
+			if (probability > 70) {
 				actionTimer = 3;
 				nowAction = 1;
-				Move();
 			}
 			else {
-				actionTimer = 0.5;
-				nowAction = 2;
-				nowPosition = position;//現在のエネミーの位置をコピー
-				Feint();
+				actionTimer = 1;
+				nowAction = 4;
 			}
 		}
 	}
-	
-	if (nowAction == 1) {
-		Move();
-	}
-	else if (nowAction == 2) {
-		Feint();
-	}
-	/*else if (nowAction == 3) {
-		Attack();
+	if (nowCps) {
+		Compensate();
 	}
 	else {
-		Damage();
-	}*/
+		if (nowAction == 1) {
+			Move();
+		}
+		else if (nowAction == 4) {
+			Feint();
+		}
+		/*else if (nowAction == 3) {
+			Attack();
+		}
+		else {
+			Damage();
+		}*/
+	}
 
 
 	//座標の更新
@@ -111,42 +114,32 @@ void EnemyActor::Update(float deltaTime)
 	if (!dead) {
 		//アニメーションの更新
 		switch (state) {
-		case State::
-		run:
-			if (isInAir) {
-				GetMesh()->Play("Jump");
-				state = State::jump;
-			}
-			else {
-				const float horizontalSpeed = velocity.x*velocity.x + velocity.z*velocity.z;
-				if (horizontalSpeed == 0) {
-					GetMesh()->Play("Idle");
-					state = State::idle;
-				}
-			}
-			break;
-
-
 		case State::idle:
-			if (isInAir) {
-				GetMesh()->Play("Jump");
-				state = State::jump;
-			}
-			else {
-				const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
-				if (horizontalSpeed != 0) {
+		{
+			const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
+			if (horizontalSpeed != 0) {
 					GetMesh()->Play("Run");
 					state = State::run;
-				}
-			}
-			break;
 
-		case State::jump:
-			if (!isInAir) {
+			}
+		}
+		break;
+
+		case State::run:
+		{
+			const float horizontalSpeed = velocity.x*velocity.x + velocity.z*velocity.z;
+			if (nowAction == 4) {
+				GetMesh()->SetAnimationSpeed(0.5);
+			}
+			else {
+				GetMesh()->SetAnimationSpeed(1);
+			}
+			if (horizontalSpeed == 0) {
 				GetMesh()->Play("Idle");
 				state = State::idle;
 			}
-			break;
+		}
+		break;
 
 		case State::attack:
 			attackTimer += deltaTime;
@@ -170,12 +163,13 @@ void EnemyActor::Update(float deltaTime)
 				nowAction = 0;
 			}
 			break;
+
 		case State::damage:
 			if (GetMesh()->IsFinished()) {
 				const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
 				if (horizontalSpeed != 0) {
-					GetMesh()->Play("Run");
-					state = State::run;
+						GetMesh()->Play("Run");
+						state = State::run;
 				}
 				else {
 					GetMesh()->Play("Idle");
@@ -240,7 +234,7 @@ void EnemyActor::Attack()
 {
 	if (!attackCollision) {
 			nowAttack = true;
-			GetMesh()->Play("Attack", false);
+			GetMesh()->Play("Attack.Kick", false);
 			attackTimer = 0.0f;
 			velocity = glm::vec3(0);
 			state = State::attack;
@@ -272,12 +266,12 @@ void EnemyActor::Move()
 	v.y = 0;
 
 	float dist = glm::length(v);//ターゲットまでの距離
- 	glm::vec3 move = glm::normalize(v);//ターゲットへの単位ベクトル
+ 	move = glm::normalize(v);//ターゲットへの単位ベクトル
 
 	if (!nowAttack) {
 		if (dist <= 2) {
 			Attack();
-			nowAction = 3;
+			nowAction = 2;
 			return;
 		}
 	}
@@ -309,10 +303,10 @@ void EnemyActor::Move()
 		//移動していないので速度を0にする
 		velocity = glm::vec3(0);
 	}
-}
 
+}
 void EnemyActor::Feint() {
-	if (!onlyOnce) {
+	/*if (!onlyOnce) {
 		ver = rand() % 15 - 7.5;
 		hor = rand() % 15 - 7.5;
 
@@ -321,21 +315,60 @@ void EnemyActor::Feint() {
 	}
 
 	glm::vec3 v =thisPos - position;
+	v.y = 0;*/
+
+	//エネミーがプレイヤーの方向を見るように設定
+	glm::vec3 d = TAct->position - position;
+	d.y = 0;
+	glm::vec3 direction = glm::normalize(d);//エネミーの前方の単位ベクトル
+
+	if (!onlyOnce) {
+
+		float pd=PlayerDist();
+		probability = rand() % 100;
+
+		if (pd <= 3) {
+			if (probability >= 60) {
+				move = glm::normalize(-d);//エネミーの後ろ方向
+
+			}
+			else if (probability >= 30) {
+				move = glm::normalize(glm::vec3(d.z, 0, -d.x));//エネミーから見て右移動
+			}
+			else {
+				move = glm::normalize(glm::vec3(-d.x, 0, d.z));//エネミーから見て左移動
+			}
+		}
+		else {
+			if (probability >= 50) {
+				move = glm::normalize(glm::vec3(d.z, 0, -d.x));//エネミーから見て右移動
+			}
+			else{
+				move = glm::normalize(glm::vec3(-d.x, 0, d.z));//エネミーから見て左移動
+			}
+		}
+		
+		//移動先を設定
+		//move = glm::normalize(-d);//エネミーの後方の単位ベクトル
+		targetPos = position + move ;
+		
+		onlyOnce = true;
+	}
+	glm::vec3 v = targetPos - position;
 	v.y = 0;
 	float dist = glm::length(v);//移動先の距離
-	glm::vec3 move = glm::normalize(v);//移動先への単位ベクトル
 
-	if (dist<= 1) {
+	if (dist<= 0.5) {
 		onlyOnce = false;
 		nowAction = 0;
 		return;
 	}
+
 	//移動が行われていたら、移動方向に応じて向きと速度を更新
 	if (glm::dot(move, move)) {
 		//向きを更新
-		move = glm::normalize(move);
-		rotation.y = std::atan2(-move.z, move.x) + glm::radians(90.0f);
-
+		direction = glm::normalize(direction);
+		rotation.y = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
 		//物体に乗っていないときは地形の勾配を考慮して移動方向を調整する
 		if (!boardingActor) {
 			//移動方向の地形の勾配(gradient)を計算
@@ -348,19 +381,44 @@ void EnemyActor::Feint() {
 
 			//地形に沿うように移動速度を設定
 			const glm::vec3 axis = glm::normalize(glm::cross(move, glm::vec3(0, 1, 0)));
-			move = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
-
+			const glm::vec3 move2 = glm::rotate(glm::mat4(1), gradient, axis) * glm::vec4(move, 1.0f);
+			velocity = move2 * feintSpped;
 		}
-		velocity = move * feintSpped;
+		else {
+			velocity = move * feintSpped;
+		}
 	}
 	else {
 		//移動していないので速度を0にする
 		velocity = glm::vec3(0);
 	}
+	
 }
 void EnemyActor::Damage() {
-	nowAction = 4;
+	nowAction = 3;
 	velocity = glm::vec3(0);
+	nowAttack = false;
 	state = State::damage;
 }
 
+void EnemyActor::Compensate() {
+	if(!onlyOnce)
+	{
+		velocity = glm::vec3(0);
+		//プレイヤーの方向を調べる
+		glm::vec3 d = TAct->position - position;
+		d.y = 0;
+		direction = glm::normalize(d);//エネミーの前方の単位ベクトル
+		targetRot = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
+		onlyOnce = true;
+	}
+	//向きを更新
+	/*direction = direction - rotation.y;
+	direction = glm::normalize(direction);*/
+	rotation.y = rotation.y - 0.05;
+	//rotation.y = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
+	if (rotation.y <= targetRot) {
+		onlyOnce = false;
+		nowCps = false;
+	}
+}
