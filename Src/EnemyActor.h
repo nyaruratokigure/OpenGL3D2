@@ -60,7 +60,7 @@ private:
 	ActorPtr boardingActor;    ///<乗っているアクター
 	
 
-	int probability = 0;	   ///<確率
+	//int probability = 0;	   ///<確率
 	glm::vec3 nowPosition;
 	glm::vec3 targetPos;
 	glm::vec3 move;

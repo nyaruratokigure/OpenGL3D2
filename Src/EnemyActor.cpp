@@ -42,7 +42,7 @@ void EnemyActor::Update(float deltaTime)
 		if (actionTimer <= 0) {
 			onlyOnce = false;
 			//float dist = PlayerDist();
-			probability = rand() % 100;
+			int probability = rand() % 100;
 			if (probability > 70) {
 				actionTimer = 3;
 				nowAction = 1;
@@ -325,7 +325,7 @@ void EnemyActor::Feint() {
 	if (!onlyOnce) {
 
 		float pd=PlayerDist();
-		probability = rand() % 100;
+		int probability = rand() % 100;
 
 		if (pd <= 3) {
 			if (probability >= 60) {
@@ -413,8 +413,9 @@ void EnemyActor::Compensate() {
 		onlyOnce = true;
 	}
 	//Œü‚«‚ðXV
-	/*direction = direction - rotation.y;
-	direction = glm::normalize(direction);*/
+	if (targetRot >= rotation.y) {
+
+	}
 	rotation.y = rotation.y - 0.05;
 	//rotation.y = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
 	if (rotation.y <= targetRot) {
