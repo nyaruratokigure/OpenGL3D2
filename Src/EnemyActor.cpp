@@ -37,7 +37,6 @@ void EnemyActor::Update(float deltaTime)
 		actionTimer = 0;
 		nowCps = true;
 	}
-	actionTimer -= deltaTime;
 	if (!nowAction == 2,3) {
 		if (actionTimer <= 0) {
 			onlyOnce = false;
@@ -54,9 +53,10 @@ void EnemyActor::Update(float deltaTime)
 		}
 	}
 	if (nowCps) {
-		Compensate();
+		Compensate(deltaTime);
 	}
 	else {
+		actionTimer -= deltaTime;
 		if (nowAction == 1) {
 			Move();
 		}
@@ -120,7 +120,6 @@ void EnemyActor::Update(float deltaTime)
 			if (horizontalSpeed != 0) {
 					GetMesh()->Play("Run");
 					state = State::run;
-
 			}
 		}
 		break;
@@ -165,6 +164,7 @@ void EnemyActor::Update(float deltaTime)
 			break;
 
 		case State::damage:
+			GetMesh()->SetAnimationSpeed(1);
 			if (GetMesh()->IsFinished()) {
 				const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
 				if (horizontalSpeed != 0) {
@@ -401,25 +401,23 @@ void EnemyActor::Damage() {
 	state = State::damage;
 }
 
-void EnemyActor::Compensate() {
-	if(!onlyOnce)
-	{
-		velocity = glm::vec3(0);
-		//プレイヤーの方向を調べる
-		glm::vec3 d = TAct->position - position;
-		d.y = 0;
-		direction = glm::normalize(d);//エネミーの前方の単位ベクトル
-		targetRot = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
-		onlyOnce = true;
+void EnemyActor::Compensate(float deltaTime) {
+	velocity = glm::vec3(0);
+	//プレイヤーの方向を調べる
+	glm::vec3 d = TAct->position - position;
+	d.y = 0;
+	targetRot = glm::normalize(d);//エネミーの前方の単位ベクトル
+	const glm::vec3 c = glm::cross(targetRot, rotation);
+	if (c.y >= 0) {
+		rotation.y += glm::radians(90.0f)*deltaTime;
+		if (rotation.y >= targetRot.y) {
+			nowCps = false;
+		}
 	}
-	//向きを更新
-	if (targetRot >= rotation.y) {
-
-	}
-	rotation.y = rotation.y - 0.05;
-	//rotation.y = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
-	if (rotation.y <= targetRot) {
-		onlyOnce = false;
-		nowCps = false;
+	else {
+		rotation.y -= glm::radians(90.0f)*deltaTime;
+		if (rotation.y <= targetRot.y) {
+			nowCps = false;
+		}
 	}
 }

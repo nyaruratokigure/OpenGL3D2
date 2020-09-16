@@ -36,7 +36,7 @@ private:
 	void Move();///<playerの座標に向けて移動する
 	void Attack();///<攻撃する際にMoveから移行する
 	void Feint();///<フェイント、左右と後退りの3パターン
-	void Compensate();///<行動間のenemyの向きを補完する
+	void Compensate(float);///<行動間のenemyの向きを補完する
 
 	/// アニメーション状態
 	enum class State {
@@ -53,7 +53,7 @@ private:
 	float moveSpeed = 3.0f;    ///<移動速度
 	float feintSpped = 1.0f;   ///<フェイント時の移動速度
 	float attackTimer = 0.0f;  ///<攻撃時間
-	float targetRot;
+	
 	
 	
 	ActorPtr attackCollision;  ///<攻撃判定
@@ -63,8 +63,10 @@ private:
 	//int probability = 0;	   ///<確率
 	glm::vec3 nowPosition;
 	glm::vec3 targetPos;
+	glm::vec3 targetRot;
 	glm::vec3 move;
 	glm::vec3 direction;
+
 	
 	
 	const Terrain::HeightMap* heightMap = nullptr;
