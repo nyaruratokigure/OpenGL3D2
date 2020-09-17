@@ -407,7 +407,9 @@ void EnemyActor::Compensate(float deltaTime) {
 	glm::vec3 d = TAct->position - position;
 	d.y = 0;
 	targetRot = glm::normalize(d);//エネミーの前方の単位ベクトル
-	const glm::vec3 c = glm::cross(targetRot, rotation);
+	glm::vec3 r = rotation;	
+	r.y = 0;
+	const glm::vec3 c = glm::cross(targetRot, r);
 	if (c.y >= 0) {
 		rotation.y += glm::radians(90.0f)*deltaTime;
 		if (rotation.y >= targetRot.y) {
