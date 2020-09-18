@@ -403,22 +403,26 @@ void EnemyActor::Damage() {
 
 void EnemyActor::Compensate(float deltaTime) {
 	velocity = glm::vec3(0);
+
 	//プレイヤーの方向を調べる
 	glm::vec3 d = TAct->position - position;
 	d.y = 0;
-	targetRot = glm::normalize(d);//エネミーの前方の単位ベクトル
-	glm::vec3 r = rotation;	
-	r.y = 0;
-	const glm::vec3 c = glm::cross(targetRot, r);
+	targetRot = glm::normalize(d);
+	float target = std::atan2(-targetRot.z, targetRot.x) + glm::radians(90.0f);
+
+	//外積計算のためにrotation.yからvec3型の単位ベクトルを作成
+	float r = rotation.y* glm::pi<float>() /180;	
+	glm::vec3 n (glm::cos(r), 0, glm::sin(r));
+	const glm::vec3 c = glm::cross(targetRot, n);//プレイヤーのいる向きとエネミーの現在の向きの外積
 	if (c.y >= 0) {
 		rotation.y += glm::radians(90.0f)*deltaTime;
-		if (rotation.y >= targetRot.y) {
+		if (rotation.y >= target) {
 			nowCps = false;
 		}
 	}
 	else {
 		rotation.y -= glm::radians(90.0f)*deltaTime;
-		if (rotation.y <= targetRot.y) {
+		if (rotation.y <= target) {
 			nowCps = false;
 		}
 	}
