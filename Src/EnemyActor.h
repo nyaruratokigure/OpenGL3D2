@@ -30,6 +30,7 @@ public:
 	float actionTimer = 0.0f;  ///<行動制御用のタイマー
 	char nowAction = 0;         ///<選択中の行動.1移動、2近接攻撃、3ダメージ、4フェイント
 	bool nowCps = false;
+	float nowAngle = 0.0f;
 	
 private:
 	float PlayerDist();
@@ -53,6 +54,7 @@ private:
 	float moveSpeed = 3.0f;    ///<移動速度
 	float feintSpped = 1.0f;   ///<フェイント時の移動速度
 	float attackTimer = 0.0f;  ///<攻撃時間
+	//float nowAngle = 0.0f;
 	
 	
 	
@@ -63,7 +65,7 @@ private:
 	//int probability = 0;	   ///<確率
 	glm::vec3 nowPosition;
 	glm::vec3 targetPos;
-	glm::vec3 targetRot;
+	//glm::vec3 targetRot;
 	glm::vec3 move;
 	glm::vec3 direction;
 

@@ -580,7 +580,7 @@ void MainGameScene::Update(float deltaTime)
 		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
 	}
 	if (enep) {
-		ss4 << L"デバッグ用:" << enep->actionTimer;
+		ss4 << L"デバッグ用:" << enep->nowAngle;
 		fontRenderer.AddString(glm::vec2(-w * 0.25f + 20, h * 0.5f - lineHeight), ss4.str().c_str());
 	}
 	
