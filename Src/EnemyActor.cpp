@@ -408,27 +408,30 @@ void EnemyActor::Compensate(float deltaTime) {
 	glm::vec3 d = TAct->position - position;
 	d.y = 0;
 	glm::vec3 targetRot = glm::normalize(d);
-	float target = std::atan2(-targetRot.z, targetRot.x) + glm::radians(90.0f);
 
 	//外積計算のためにrotation.yからvec3型の単位ベクトルを作成
 	float r = rotation.y* glm::pi<float>() /180.0f;	
 	glm::vec3 n (glm::cos(r), 0, glm::sin(r));
+	n = glm::normalize(n);
 	const glm::vec3 cross = glm::cross(targetRot, n);//プレイヤーのいる向きとエネミーの現在の向きの外積
 
-	float dot = glm::dot(targetRot, n);
-	
-	nowAngle = glm::acos(dot)*180.0f / glm::pi<float>();
+	//float dot = glm::dot(targetRot, nowRot);
+
+	float radA = std::atan2(-targetRot.z, targetRot.x);
+	float radB = std::atan2(-n.z, n.x);
+	float rad = std::max(radA, radB) - std::min(radA, radB);
+	nowAngle = glm::acos(rad)*180.0f/ glm::pi<float>();
 	
 	
 	if (cross.y >= 0) {
 		rotation.y += glm::radians(90.0f)*deltaTime;
-		if (nowAngle<=1.0f) {
+		if (nowAngle<=0.5f) {
 			nowCps = false;
 		}
 	}
 	else {
 		rotation.y -= glm::radians(90.0f)*deltaTime;
-		if (nowAngle<=1.0f) {
+		if (nowAngle<=0.5f) {
 			nowCps = false;
 		}
 	}
