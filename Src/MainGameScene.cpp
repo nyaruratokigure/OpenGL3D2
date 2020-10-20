@@ -579,10 +579,10 @@ void MainGameScene::Update(float deltaTime)
 		ss3 << L"デバッグ用:" << enep->rotation.y;
 		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
 	}*/
-	if (enep) {
-		ss4 << L"デバッグ用:" << enep->nowAngle;
+	/*if (enep) {
+		ss4 << L"デバッグ用:" << enep->;
 		fontRenderer.AddString(glm::vec2(-w * 0.25f + 20, h * 0.5f - lineHeight), ss4.str().c_str());
-	}
+	}*/
 	
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();

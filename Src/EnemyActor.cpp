@@ -35,10 +35,9 @@ void EnemyActor::Update(float deltaTime)
 
 	if (nowAction == 0) {
 		actionTimer = 0;
-		nowCps = true;
 	}
-	if (!nowAction == 2,3) {
-		if (actionTimer <= 0) {
+	if (actionTimer <= 0) {
+		if (!nowAction == 2, 3) {
 			onlyOnce = false;
 			//float dist = PlayerDist();
 			int probability = rand() % 100;
@@ -52,9 +51,7 @@ void EnemyActor::Update(float deltaTime)
 			}
 		}
 	}
-	if (nowCps) {
-		Compensate(deltaTime);
-	}
+	
 	else {
 		actionTimer -= deltaTime;
 		if (nowAction == 1) {
