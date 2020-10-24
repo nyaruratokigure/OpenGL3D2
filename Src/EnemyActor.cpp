@@ -28,16 +28,14 @@ EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 +*/
 void EnemyActor::Update(float deltaTime)
 {
-	if (dead) {
-		velocity = glm::vec3(0);
+	if (dead) 
 		return;
-	}
 
 	if (nowAction == 0) {
 		actionTimer = 0;
 	}
 	if (actionTimer <= 0) {
-		if (!nowAction == 2, 3) {
+		if (!nowAction == 2||3) {
 			onlyOnce = false;
 			//float dist = PlayerDist();
 			int probability = rand() % 100;
@@ -46,7 +44,7 @@ void EnemyActor::Update(float deltaTime)
 				nowAction = 1;
 			}
 			else {
-				actionTimer = 1;
+				actionTimer = 1.5;
 				nowAction = 4;
 			}
 		}
@@ -115,8 +113,23 @@ void EnemyActor::Update(float deltaTime)
 		{
 			const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
 			if (horizontalSpeed != 0) {
+				if (nowAction == 1) {
 					GetMesh()->Play("Run");
 					state = State::run;
+				}
+				else if(nowAction == 4) {
+					if (feintD == 0) {
+						GetMesh()->Play("Run");
+						GetMesh()->SetAnimationSpeed(0.7);
+					}
+					if (feintD == 1) {
+						GetMesh()->Play("MoveToLeft");
+					}
+					if (feintD == 2) {
+						GetMesh()->Play("MoveToRight");
+					}
+					state = State::feint;
+				}
 			}
 		}
 		break;
@@ -124,16 +137,25 @@ void EnemyActor::Update(float deltaTime)
 		case State::run:
 		{
 			const float horizontalSpeed = velocity.x*velocity.x + velocity.z*velocity.z;
-			if (nowAction == 4) {
-				GetMesh()->SetAnimationSpeed(0.5);
-			}
-			else {
-				GetMesh()->SetAnimationSpeed(1);
-			}
 			if (horizontalSpeed == 0) {
 				GetMesh()->Play("Idle");
 				state = State::idle;
 			}
+			
+			if (nowAction == 4) {
+				if (feintD == 0) {
+					GetMesh()->Play("Run");
+					GetMesh()->SetAnimationSpeed(0.7);
+				}
+				if (feintD == 1) {
+					GetMesh()->Play("MoveToLeft");
+				}
+				if (feintD == 2) {
+					GetMesh()->Play("MoveToRight");
+				}
+				state = State::feint;
+			}
+
 		}
 		break;
 
@@ -163,17 +185,39 @@ void EnemyActor::Update(float deltaTime)
 		case State::damage:
 			GetMesh()->SetAnimationSpeed(1);
 			if (GetMesh()->IsFinished()) {
-				const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
-				if (horizontalSpeed != 0) {
-						GetMesh()->Play("Run");
-						state = State::run;
-				}
-				else {
-					GetMesh()->Play("Idle");
-					state = State::idle;
-				}
+				state = State::idle;
 				nowAction = 0;
 			}
+			break;
+
+		case State::feint:
+			const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
+
+			
+			if (horizontalSpeed == 0 || nowAction == 0) {
+				GetMesh()->Play("Idle");
+				state = State::idle;
+			}
+
+			if (nowAction == 1) {
+				GetMesh()->Play("Run");
+				GetMesh()->SetAnimationSpeed(1);
+				state = State::run;
+			}
+			/*else if (nowAction == 4) {
+				if (feintD == 0) {
+					GetMesh()->Play("Run");
+				 	GetMesh()->SetAnimationSpeed(0.5);
+				}
+				if (feintD == 1) {
+					GetMesh()->Play("MoveToLeft");
+					GetMesh()->SetAnimationSpeed(1);
+				}
+				if (feintD == 2) {
+					GetMesh()->Play("MoveToRight");
+					GetMesh()->SetAnimationSpeed(1);
+				}
+			}*/
 			break;
 		}
 	}
@@ -231,7 +275,8 @@ void EnemyActor::Attack()
 {
 	if (!attackCollision) {
 			nowAttack = true;
-			GetMesh()->Play("Attack.Kick", false);
+			/*GetMesh()->Play("Attack.Kick", false);*/
+			GetMesh()->Play("MoveToLeft", false);
 			attackTimer = 0.0f;
 			velocity = glm::vec3(0);
 			state = State::attack;
@@ -308,17 +353,6 @@ void EnemyActor::Move()
 
 }
 void EnemyActor::Feint() {
-	/*if (!onlyOnce) {
-		ver = rand() % 15 - 7.5;
-		hor = rand() % 15 - 7.5;
-
-		onlyOnce = true;
-		thisPos = nowPosition - glm::vec3(ver, 0, hor);
-	}
-
-	glm::vec3 v =thisPos - position;
-	v.y = 0;*/
-
 	//エネミーがプレイヤーの方向を見るように設定
 	glm::vec3 d = TAct->position - position;
 	d.y = 0;
@@ -332,27 +366,31 @@ void EnemyActor::Feint() {
 		if (pd <= 3) {
 			if (probability >= 60) {
 				move = glm::normalize(-d);//エネミーの後ろ方向
-
+				feintD = 0;
 			}
 			else if (probability >= 30) {
-				move = glm::normalize(glm::vec3(d.z, 0, -d.x));//エネミーから見て右移動
+				move = glm::normalize(glm::vec3(-d.x, 0, d.z));//エネミーから見て左移動
+				feintD = 1;
 			}
 			else {
-				move = glm::normalize(glm::vec3(-d.x, 0, d.z));//エネミーから見て左移動
+				move = glm::normalize(glm::vec3(d.z, 0, -d.x));//エネミーから見て右移動
+				feintD = 2;
 			}
 		}
 		else {
 			if (probability >= 50) {
-				move = glm::normalize(glm::vec3(d.z, 0, -d.x));//エネミーから見て右移動
+				move = glm::normalize(glm::vec3(-d.x, 0, d.z));//エネミーから見て左移動
+				feintD = 1;
 			}
 			else{
-				move = glm::normalize(glm::vec3(-d.x, 0, d.z));//エネミーから見て左移動
+				move = glm::normalize(glm::vec3(d.z, 0, -d.x));//エネミーから見て右移動
+				feintD = 2;
 			}
 		}
 		
 		//移動先を設定
 		//move = glm::normalize(-d);//エネミーの後方の単位ベクトル
-		targetPos = position + move ;
+		targetPos = position + move * glm::vec3(2.0, 0, 2.0);
 		
 		onlyOnce = true;
 	}
@@ -402,5 +440,3 @@ void EnemyActor::Damage() {
 	nowAttack = false;
 	state = State::damage;
 }
-
-

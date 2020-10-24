@@ -28,7 +28,8 @@ public:
 	}
 	void Damage();
 	float actionTimer = 0.0f;  ///<行動制御用のタイマー
-	char nowAction = 0;         ///<選択中の行動.1移動、2近接攻撃、3ダメージ、4フェイント
+	int nowAction = 0;         ///<選択中の行動.1移動、2近接攻撃、3ダメージ、4フェイント
+	int feintD = 0;          ///<フェイントの方向
 	
 private:
 	float PlayerDist();
@@ -36,12 +37,14 @@ private:
 	void Attack();///<攻撃する際にMoveから移行する
 	void Feint();///<フェイント、左右と後退りの3パターン
 
+
 	/// アニメーション状態
 	enum class State {
 		idle, ///<停止
 		run,  ///<移動
 		attack, ///< 攻撃
 		damage,///<ダメージを受けた際
+		feint,///<フェイント
 		dead,///<死亡時
 	};
 	State state = State::idle; ///<現在のアニメーション状態
@@ -49,19 +52,19 @@ private:
 	bool nowAttack = false;	   ///<攻撃中かどうか
 	bool onlyOnce = false;
 	float moveSpeed = 3.0f;    ///<移動速度
-	float feintSpped = 1.0f;   ///<フェイント時の移動速度
+	float feintSpped = 2.0f;   ///<フェイント時の移動速度
 	float attackTimer = 0.0f;  ///<攻撃時間	
+	
 	
 	ActorPtr attackCollision;  ///<攻撃判定
 	ActorPtr boardingActor;    ///<乗っているアクター
 	
 
 	//int probability = 0;	   ///<確率
-	glm::vec3 nowPosition;
 	glm::vec3 targetPos;
-	//glm::vec3 targetRot;
 	glm::vec3 move;
 	glm::vec3 direction;
+
 
 	
 	
