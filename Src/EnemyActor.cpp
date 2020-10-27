@@ -32,14 +32,16 @@ void EnemyActor::Update(float deltaTime)
 		return;
 
 	if (nowAction == 0) {
-
+		Inactive();
 	}
 
 	if (nowAction == 1) {
 		actionTimer = 0;
 	}
 	if (actionTimer <= 0) {
-		if (!nowAction ==0||3||4) {
+		if (nowAction ==1||
+			nowAction == 2||
+			nowAction == 5){
 			onlyOnce = false;
 			//float dist = PlayerDist();
 			int probability = rand() % 100;
@@ -137,6 +139,15 @@ void EnemyActor::Update(float deltaTime)
 			}
 		}
 		break;
+
+		case State::inactive:
+			if (nowAction != 0) {
+				GetMesh()->Play("Idle");
+				state = State::idle;
+			}
+
+			break;
+
 
 		case State::run:
 		{
@@ -294,12 +305,25 @@ float getRadian(float x, float z, float x2, float z2) {
 
 void EnemyActor::Inactive()
 {
+	GetMesh()->Play("Idle");
+	state = State::inactive;
+
 	glm::vec3 v = TAct->position - position;
 
 	v.y = 0;
+
+	float dist = glm::length(v);//ターゲットまでの距離
 	glm::vec3 direction = glm::normalize(v);//ターゲットへの単位ベクトル
 
-	rotation.y = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
+	float playerY = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
+	float angleA = std::atan2(-direction.z, direction.x) + glm::radians(45.0f);
+	float angleB = std::atan2(-direction.z, direction.x) + glm::radians(135.0f);
+
+	if (dist <= 3) {
+		if (angleA <= playerY || playerY <= angleB) {
+			nowAction = 1;
+		}
+	}
 	//BGM,非アクティブつくる
 }
 

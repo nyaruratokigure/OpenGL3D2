@@ -41,8 +41,8 @@ private:
 
 	/// アニメーション状態
 	enum class State {
-		inactive,///非アクティブ時
 		idle, ///<停止
+		inactive,///非アクティブ時
 		run,  ///<移動
 		attack, ///< 攻撃
 		damage,///<ダメージを受けた際
