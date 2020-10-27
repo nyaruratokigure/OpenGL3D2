@@ -28,11 +28,12 @@ public:
 	}
 	void Damage();
 	float actionTimer = 0.0f;  ///<行動制御用のタイマー
-	int nowAction = 0;         ///<選択中の行動.1移動、2近接攻撃、3ダメージ、4フェイント
+	int nowAction = 0;         ///<選択中の行動.0未発見、1ニュートラル、2移動、3攻撃、4ダメージ、5フェイント
 	int feintD = 0;          ///<フェイントの方向
 	
 private:
 	float PlayerDist();
+	void Inactive();///<非アクティブ、プレイヤーを発見する前の状態
 	void Move();///<playerの座標に向けて移動する
 	void Attack();///<攻撃する際にMoveから移行する
 	void Feint();///<フェイント、左右と後退りの3パターン
@@ -40,6 +41,7 @@ private:
 
 	/// アニメーション状態
 	enum class State {
+		inactive,///非アクティブ時
 		idle, ///<停止
 		run,  ///<移動
 		attack, ///< 攻撃
