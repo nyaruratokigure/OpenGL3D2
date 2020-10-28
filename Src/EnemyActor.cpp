@@ -315,16 +315,25 @@ void EnemyActor::Inactive()
 	float dist = glm::length(v);//ターゲットまでの距離
 	glm::vec3 direction = glm::normalize(v);//ターゲットへの単位ベクトル
 
-	float playerY = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
-	float angleA = std::atan2(-direction.z, direction.x) + glm::radians(45.0f);
-	float angleB = std::atan2(-direction.z, direction.x) + glm::radians(135.0f);
+	float target = std::atan2(-direction.z, direction.x) + glm::radians(90.0f);
+
+	float A = rotation.y - 1.0f;
+	float B = rotation.y + 1.0f;
+	float C, D;
+	float pi = M_PI;
+	if (A <= -pi) {
+		C = A + pi;
+		D = pi - C;
+
+	}
 
 	if (dist <= 3) {
-		if (angleA <= playerY || playerY <= angleB) {
+		if (A <= target || target <= B) {
 			nowAction = 1;
 		}
 	}
 	//BGM,非アクティブつくる
+	//playerのいる向きに当たる数値を移動させて範囲の値rotation.yから作成して固定
 }
 
 /*

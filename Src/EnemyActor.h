@@ -3,10 +3,12 @@
 */
 #ifndef ENEMYACTOR_H_INCLUDED
 #define ENEMYACTOR_H_INCLUDED
+#define _USE_MATH_DEFINES
 #include "GLFWEW.h"
 #include "SkeletalMeshActor.h"
 #include "Terrain.h"
 #include <memory>
+#include <math.h>
 
 /*
 エネミーアクター
