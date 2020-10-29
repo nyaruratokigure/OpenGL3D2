@@ -32,6 +32,7 @@ public:
 	float actionTimer = 0.0f;  ///<行動制御用のタイマー
 	int nowAction = 0;         ///<選択中の行動.0未発見、1ニュートラル、2移動、3攻撃、4ダメージ、5フェイント
 	int feintD = 0;          ///<フェイントの方向
+	float targett;
 	
 private:
 	float PlayerDist();
