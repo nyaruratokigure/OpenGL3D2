@@ -576,13 +576,13 @@ void MainGameScene::Update(float deltaTime)
 	ss2 << L"HP:" << player->health;
 	fontRenderer.AddString(glm::vec2(w * 0.4f +20, h * 0.5f - lineHeight), ss2.str().c_str());
 	if (enep) {
-		ss3 << L"デバッグ用:" << enep->targett;
+		ss3 << L"デバッグ用:" << enep->A;
 		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
 	}
-	/*if (enep) {
-		ss4 << L"デバッグ用:" << enep->;
+	if (enep) {
+		ss4 << L"デバッグ用:" << enep->B;
 		fontRenderer.AddString(glm::vec2(-w * 0.25f + 20, h * 0.5f - lineHeight), ss4.str().c_str());
-	}*/
+	}
 	
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();

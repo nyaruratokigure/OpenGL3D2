@@ -19,8 +19,8 @@ EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 	heightMap(hm)
 {
 	colLocal = Collision::CreateSphere(glm::vec3(0, 0.7f, 0), 0.7f);
-	GetMesh()->Play("Idle");
-	state = State::idle;
+	GetMesh()->Play("Idle.LookAround");
+	state = State::inactive;
 }
 /*
 更新
@@ -50,7 +50,7 @@ void EnemyActor::Update(float deltaTime)
 				nowAction = 2;
 			}
 			else {
-				actionTimer = 1.5;
+				actionTimer = 1.5f;
 				nowAction = 5;
 			}
 		}
@@ -206,10 +206,8 @@ void EnemyActor::Update(float deltaTime)
 			break;
 
 		case State::feint:
-			const float horizontalSpeed = velocity.x* velocity.x + velocity.z * velocity.z;
 
-			
-			if (horizontalSpeed == 0 || nowAction == 0) {
+			if (nowAction == 1) {
 				GetMesh()->Play("Idle");
 				state = State::idle;
 			}
@@ -276,8 +274,7 @@ void EnemyActor::Attack()
 {
 	if (!attackCollision) {
 			nowAttack = true;
-			/*GetMesh()->Play("Attack.Kick", false);*/
-			GetMesh()->Play("MoveToLeft", false);
+			GetMesh()->Play("Attack.Kick", false);
 			attackTimer = 0.0f;
 			velocity = glm::vec3(0);
 			state = State::attack;
@@ -298,16 +295,8 @@ void EnemyActor::SetBoardingActor(ActorPtr p)
 	}
 }
 
-float getRadian(float x, float z, float x2, float z2) {
-	float rad = std::atan2(z2 - z, x2 - x);
-	return rad;
-}
-
 void EnemyActor::Inactive()
 {
-	GetMesh()->Play("Idle");
-	state = State::inactive;
-
 	glm::vec3 v = TAct->position - position;
 
 	v.y = 0;
@@ -316,12 +305,17 @@ void EnemyActor::Inactive()
 	glm::vec3 direction = glm::normalize(v);//ターゲットへの単位ベクトル
 
 	float target = std::atan2(-direction.z, direction.x)/* + glm::radians(90.0f)*/;
-	targett = target;
 
 	float A = rotation.y - 1.0f;
 	float B = rotation.y + 1.0f;
 	float C = 0;
 	float pi = M_PI;
+	targett = target + (pi / 2);
+	if(pi<=targett){
+		targett = targett - pi;
+		targett = -pi + targett;
+	}
+
 	if (A <= -pi) {
 		C = A + (pi*2);
 	}
@@ -330,16 +324,16 @@ void EnemyActor::Inactive()
 	}
 
 	if (dist <= 3) {
-		if (A <= target || target <= B) {
+		if (A <= targett&&targett<= B) {
 			nowAction = 1;
 		}
-		else if (C <= 0) {
-			if (target <= C) {
+		else if (C < 0) {
+			if (targett <= C) {
 				nowAction = 1;
 			}
 		}
-		else {
-			if (C <= target) {
+		else if (C > 0) {
+			if (C <= targett) {
 				nowAction = 1;
 			}
 		}
@@ -407,7 +401,7 @@ void EnemyActor::Feint() {
 
 	if (!onlyOnce) {
 
-		float pd=PlayerDist();
+		float pd = PlayerDist();
 		int probability = rand() % 100;
 
 		if (pd <= 3) {
@@ -437,7 +431,7 @@ void EnemyActor::Feint() {
 		
 		//移動先を設定
 		//move = glm::normalize(-d);//エネミーの後方の単位ベクトル
-		targetPos = position + move * glm::vec3(2.0, 0, 2.0);
+		targetPos = position + move * glm::vec3(2.0f, 0, 2.0f);
 		
 		onlyOnce = true;
 	}
