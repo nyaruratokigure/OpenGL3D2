@@ -564,6 +564,8 @@ bool SkeletalMesh::Play(const std::string& animationName, bool loop)
   if (file) {
     for (const auto& e : file->animations) {
       if (e.name == animationName) {
+		  const char c = e.name[0];
+		std::cout << "[アニメチェンジ]" << (animation ? animation->name : "(null)") << "->" << e.name << "\n";
         animation = &e;
         frame = 0;
         state = State::play;

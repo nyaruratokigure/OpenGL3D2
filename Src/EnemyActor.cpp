@@ -295,6 +295,7 @@ void EnemyActor::SetBoardingActor(ActorPtr p)
 	}
 }
 
+
 void EnemyActor::Inactive()
 {
 	glm::vec3 v = TAct->position - position;

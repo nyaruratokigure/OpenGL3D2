@@ -73,9 +73,9 @@ bool MainGameScene::Initialize()
 	fontRenderer.LoadFromFile("Res/font.fnt");
 
 	//テキストウィンドウを表示
-	/*textWindow.Init("Res/TextWindow.tga",
+	textWindow.Init("Res/TextWindow.tga",
 		glm::vec2(0, -248), glm::vec2(48, 32), glm::vec2(0));
-	textWindow.Open(
+	/*textWindow.Open(
 		L"地蔵を悪い鬼から救おう！\n(地蔵に触れてみよう)\nWASD :移動\nJ :攻撃");*/
 
 	meshBuffer.Init(1'000'000 * sizeof(Mesh::Vertex), 3'000'000 * sizeof(GLushort));
@@ -95,7 +95,7 @@ bool MainGameScene::Initialize()
 
 	//FBOを作成する
 	const GLFWEW::Window& window = GLFWEW::Window::Instance();
-	fboMain = FrameBufferObject::Create(window.Width(), window.Height(),GL_RGBA16F);
+	fboMain = FrameBufferObject::Create(window.Width(), window.Height(), GL_RGBA16F);
 	Mesh::FilePtr rt = meshBuffer.AddPlane("RenderTarget");
 	if (rt) {
 		rt->materials[0].program = Shader::Program::Create(
@@ -176,7 +176,7 @@ bool MainGameScene::Initialize()
 
 	glm::vec3 startPos(100, 0, 100);
 	startPos.y = heightMap.Height(startPos);
-	
+
 	player = std::make_shared<PlayerActor>(&heightMap, meshBuffer, startPos);
 
 	rand.seed(0);
@@ -185,7 +185,7 @@ bool MainGameScene::Initialize()
 	const int lightRangeMin = 80;
 	const int lightRangeMax = 120;
 	lights.Add(std::make_shared<DirectionalLightActor>(
-		"DirectionalLight", glm::vec3(1.0f,0.94f,0.91f), glm::normalize(glm::vec3(1, -2, -1))));
+		"DirectionalLight", glm::vec3(1.0f, 0.94f, 0.91f), glm::normalize(glm::vec3(1, -2, -1))));
 	for (int i = 0; i < 50; ++i) {
 		glm::vec3 color = glm::vec3(1, 0.8f, 0.5f)*20.0f;//ポイントライトの色＊明るさ
 		glm::vec3 position(0);
@@ -224,8 +224,8 @@ bool MainGameScene::Initialize()
 	//お地蔵様を配置
 	for (int i = 0; i < 4; ++i) {
 		glm::vec3 position(0);
-		position.x = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(85,115)(rand));
-		position.z = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(85,115)(rand));
+		position.x = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(85, 115)(rand));
+		position.z = static_cast<float>(std::uniform_int_distribution<>/*(75, 125)*/(85, 115)(rand));
 		position.y = heightMap.Height(position);
 		glm::vec3 rotation(0);
 		rotation.y = std::uniform_real_distribution<float>(0.0f, 3.14f * 2.0f)(rand);
@@ -293,7 +293,7 @@ bool MainGameScene::Initialize()
 		//地蔵用パーティクル
 		for (auto o : objects) {
 			ParticleEmitterParameter ep;
-			
+
 			ep.id = particleID;
 			ep.imagePath = "Res/Mist.tga";
 			ep.tiles = glm::ivec2(2, 2);
@@ -310,7 +310,7 @@ bool MainGameScene::Initialize()
 			++particleID;
 		}
 	}
-	
+
 	//{
 	//	//エミッター3個目
 	//	ParticleEmitterParameter ep;
@@ -362,7 +362,7 @@ void MainGameScene::ProcessInput()
 	//		}
 	//	}
 	//}
-	
+
 }
 /*
 シーンを更新する
@@ -401,7 +401,7 @@ void MainGameScene::Update(float deltaTime)
 				bb->colLocal = Collision::Shape{};
 				hitEffect = true;
 				bb->health = 1;
-				
+
 				bb->Dead();
 				Audio::Engine::Instance().Prepare("Res/Audio/EnemyDead.wav")->Play();
 				bb->GetMesh()->Play("Down", false);//敵の死亡時のアニメーション
@@ -413,7 +413,7 @@ void MainGameScene::Update(float deltaTime)
 				bb->Damage();
 			}
 			hit = true;
-			}
+		}
 		);
 		if (hit) {
 			PlayerAttackCollision->health = 0;
@@ -529,7 +529,7 @@ void MainGameScene::Update(float deltaTime)
 	//敵を全滅させたら目的達成フラグをtrueにする
 	if (jizoId >= 0) {
 		if (enemies.Empty()) {
-			particleSystem.Remove( particleSystem.Find(jizoId));
+			particleSystem.Remove(particleSystem.Find(jizoId));
 			achivements[jizoId] = true;
 			jizoId = -1;
 			--jizoCount;
@@ -540,7 +540,7 @@ void MainGameScene::Update(float deltaTime)
 	if (achivements[0] &&
 		achivements[1] &&
 		achivements[2] &&
-		achivements[3] ==true) {
+		achivements[3] == true) {
 		bgm->Stop();
 		SceneStack::Instance().Replace(std::make_shared<ClearScene>());
 		return;
@@ -552,7 +552,7 @@ void MainGameScene::Update(float deltaTime)
 			return;
 		}
 	}
-	
+
 	player->UpdateDrawData(deltaTime);
 	enemies.UpdateDrawData(deltaTime);
 	trees.UpdateDrawData(deltaTime);
@@ -570,20 +570,20 @@ void MainGameScene::Update(float deltaTime)
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
 
-	std::wstringstream ss1,ss2,ss3,ss4;
+	std::wstringstream ss1, ss2, ss3, ss4;
 	ss1 << L"未開放地蔵:" << jizoCount;
 	fontRenderer.AddString(glm::vec2(-w * 0.5f + 20, h * 0.5f - lineHeight), ss1.str().c_str());
 	ss2 << L"HP:" << player->health;
-	fontRenderer.AddString(glm::vec2(w * 0.4f +20, h * 0.5f - lineHeight), ss2.str().c_str());
-	if (enep) {
+	fontRenderer.AddString(glm::vec2(w * 0.4f + 20, h * 0.5f - lineHeight), ss2.str().c_str());
+	/*if (enep) {
 		ss3 << L"デバッグ用:" << enep->A;
 		fontRenderer.AddString(glm::vec2(w * 0.0f + 20, h * 0.5f - lineHeight), ss3.str().c_str());
 	}
 	if (enep) {
 		ss4 << L"デバッグ用:" << enep->B;
 		fontRenderer.AddString(glm::vec2(-w * 0.25f + 20, h * 0.5f - lineHeight), ss4.str().c_str());
-	}
-	
+	}*/
+
 	//fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
 	fontRenderer.EndUpdate();
 
@@ -632,8 +632,8 @@ void MainGameScene::Render()
 		const float near = 10.0f; //描画範囲の手前側の境界
 		const float far = 200.0f; //描画範囲の奥側の境界
 		const glm::mat4 matProj =
-		glm::ortho<float>(-width / 2, width / 2, -height / 2, height / 2, near, far);
-		
+			glm::ortho<float>(-width / 2, width / 2, -height / 2, height / 2, near, far);
+
 		//ビュー・プロジェクション行列を設定してメッシュを描画
 		meshBuffer.SetShadowViewProjectionMatrix(matProj*matView);
 		RenderMesh(Mesh::DrawType::shadow);
@@ -756,16 +756,16 @@ void MainGameScene::Render()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, window.Width(), window.Height());
-		
+
 		const glm::vec2 screenSize(window.Width(), window.Height());
 		spriteRenderer.Draw(screenSize);
-		
+
 		//被写界深度エフェクト適用後の画像を描画
 		glDisable(GL_BLEND);
 		Mesh::FilePtr simpleMesh = meshBuffer.GetFile("Simple");
 		simpleMesh->materials[0].texture[0] = fboDepthOfField->GetColorTexture();
 		Mesh::Draw(simpleMesh, glm::mat4(1));
-		
+
 		//拡散光を描画
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -814,11 +814,10 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		rotation.y = std::uniform_real_distribution<float>(0, 3.14f * 2.0f)(rand);
 		enep = std::make_shared<EnemyActor>(
 			&heightMap, meshBuffer, position, rotation);
-		enep->GetMesh()->Play("Wait");
 		/*enep->colLocal = Collision::CreateCapsule(
 			glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);*/
 
-		//追いかけるターゲットを指定
+			//追いかけるターゲットを指定
 		enep->SetTarget(player);
 		enemies.Add(enep);
 	}
@@ -834,11 +833,11 @@ void MainGameScene::Camera::Update(const glm::mat4& matView)
 {
 	const glm::vec4 pos = matView * glm::vec4(target, 1);
 	focalPlane = pos.z * -1000.0f;
-	
+
 	const float imageDistance = sensorSize * 0.5f / glm::tan(fov * 0.5f);
 	focalLength = 1.0f / ((1.0f / focalPlane) + (1.0f / imageDistance));
 	aperture = focalLength / fNumber;
-	}
+}
 
 /*
 メッシュを描画する
@@ -849,7 +848,7 @@ void MainGameScene::RenderMesh(Mesh::DrawType drawType)
 	cubePos.y = heightMap.Height(cubePos);
 	const glm::mat4 matModel = glm::translate(glm::mat4(1), cubePos);
 	Mesh::Draw(meshBuffer.GetFile("Cube"), matModel,drawType);*/
-	Mesh::Draw(meshBuffer.GetFile("Terrain"), glm::mat4(1),drawType);
+	Mesh::Draw(meshBuffer.GetFile("Terrain"), glm::mat4(1), drawType);
 
 	player->Draw(drawType);
 	enemies.Draw(drawType);
@@ -862,7 +861,7 @@ void MainGameScene::RenderMesh(Mesh::DrawType drawType)
 		glm::translate(glm::mat4(1), treePos) * glm::scale(glm::mat4(1), glm::vec3(3));
 	//Mesh::Draw(meshBuffer.GetFile("Res/red_pine_tree.gltf"),  matTreeModel,drawType);
 
-	if(drawType == Mesh::DrawType::color)
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	if (drawType == Mesh::DrawType::color)
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	Mesh::Draw(meshBuffer.GetFile("Water"), glm::mat4(1), drawType);
 }

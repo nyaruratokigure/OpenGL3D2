@@ -60,6 +60,7 @@ bool BufferObject::BufferSubData(GLintptr offset, GLsizeiptr size, const GLvoid*
 	glBindBuffer(target, 0);
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
+
 		std::cerr << "[エラー] " << __func__ << ": データの転送に失敗.\n";
 	}
 	return error == GL_NO_ERROR;
