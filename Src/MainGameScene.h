@@ -85,6 +85,7 @@ private:
 	ActorList enemies;
 	ActorList trees;
 	ActorList objects;
+	ActorList marks;
 	EnemyActorPtr enep;
 
 

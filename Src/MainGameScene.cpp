@@ -61,7 +61,7 @@ bool MainGameScene::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/kuro.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/exclamation.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -264,8 +264,7 @@ bool MainGameScene::Initialize()
 
 	//木を配置
 	{
-		const size_t treeCount = 30
-			;
+		const size_t treeCount = 30;
 		trees.Reserve(treeCount);
 		const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/red_pine_tree.gltf");
 		for (size_t i = 0; i < treeCount; ++i) {
@@ -283,6 +282,13 @@ bool MainGameScene::Initialize()
 				glm::vec3(0, 0, 0), glm::vec3(0, 3, 0), 0.3f);
 			trees.Add(p);
 		}
+	}
+
+	//マークを配置
+	{
+		const size_t markCount = 10;
+		marks.Reserve(markCount);
+		const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/red_pine_tree.gltf");
 	}
 
 	////オープニングスクリプトを実行
@@ -758,7 +764,7 @@ void MainGameScene::Render()
 		glViewport(0, 0, window.Width(), window.Height());
 
 		const glm::vec2 screenSize(window.Width(), window.Height());
-		spriteRenderer.Draw(screenSize);
+		//spriteRenderer.Draw(screenSize);
 
 		//被写界深度エフェクト適用後の画像を描画
 		glDisable(GL_BLEND);
@@ -774,6 +780,7 @@ void MainGameScene::Render()
 
 		textWindow.Draw();
 		fontRenderer.Draw(screenSize);
+		spriteRenderer.Draw(screenSize);
 	}
 
 	////デバッグのために、影用の深度テクスチャを表示する

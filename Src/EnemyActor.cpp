@@ -305,7 +305,7 @@ void EnemyActor::Inactive()
 	float dist = glm::length(v);//ターゲットまでの距離
 	glm::vec3 direction = glm::normalize(v);//ターゲットへの単位ベクトル
 
-	float target = std::atan2(-direction.z, direction.x)/* + glm::radians(90.0f)*/;
+	float target = std::atan2(-direction.z, direction.x);
 
 	float A = rotation.y - 1.0f;
 	float B = rotation.y + 1.0f;
