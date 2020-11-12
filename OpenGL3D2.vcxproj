@@ -165,6 +165,7 @@
     <ClInclude Include="Src\GamePad.h" />
     <ClInclude Include="Src\Geometry.h" />
     <ClInclude Include="Src\GLFWEW.h" />
+    <ClInclude Include="Src\Image.h" />
     <ClInclude Include="Src\JizoActor.h" />
     <ClInclude Include="Src\json11\json11.hpp" />
     <ClInclude Include="Src\Light.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="Src\FramebufferObject.cpp" />
     <ClCompile Include="Src\GameOverScene.cpp" />
     <ClCompile Include="Src\GLFWEW.cpp" />
+    <ClCompile Include="Src\Image.cpp" />
     <ClCompile Include="Src\JizoActor.cpp" />
     <ClCompile Include="Src\json11\json11.cpp" />
     <ClCompile Include="Src\Light.cpp" />
