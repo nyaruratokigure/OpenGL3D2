@@ -61,7 +61,7 @@ bool MainGameScene::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/exclamation.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/kuro.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -89,6 +89,7 @@ bool MainGameScene::Initialize()
 	meshBuffer.LoadSkeletalMesh("Res/bikuni.gltf");
 	meshBuffer.LoadSkeletalMesh("Res/oni_small.gltf");
 	meshBuffer.LoadMesh("Res/wall_stone.gltf");
+	meshBuffer.LoadMesh("Res/exclamation.gltf");
 
 	//パーティクル・システムを初期化する
 	particleSystem.Init(1000);
@@ -288,7 +289,6 @@ bool MainGameScene::Initialize()
 	{
 		const size_t markCount = 10;
 		marks.Reserve(markCount);
-		const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/red_pine_tree.gltf");
 	}
 
 	////オープニングスクリプトを実行
@@ -387,6 +387,7 @@ void MainGameScene::Update(float deltaTime)
 	trees.Update(deltaTime);
 	objects.Update(deltaTime);
 	lights.Update(deltaTime);
+	marks.Update(deltaTime);
 
 	DetectCollision(player, enemies);
 	DetectCollision(player, trees);
@@ -563,6 +564,7 @@ void MainGameScene::Update(float deltaTime)
 	enemies.UpdateDrawData(deltaTime);
 	trees.UpdateDrawData(deltaTime);
 	objects.UpdateDrawData(deltaTime);
+	marks.UpdateDrawData(deltaTime);
 
 	spriteRenderer.BeginUpdate();
 	for (const Sprite& e : sprites) {
@@ -765,6 +767,7 @@ void MainGameScene::Render()
 
 		const glm::vec2 screenSize(window.Width(), window.Height());
 		//spriteRenderer.Draw(screenSize);
+		spriteRenderer.Draw(screenSize);
 
 		//被写界深度エフェクト適用後の画像を描画
 		glDisable(GL_BLEND);
@@ -780,7 +783,6 @@ void MainGameScene::Render()
 
 		textWindow.Draw();
 		fontRenderer.Draw(screenSize);
-		spriteRenderer.Draw(screenSize);
 	}
 
 	////デバッグのために、影用の深度テクスチャを表示する
@@ -821,13 +823,31 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		rotation.y = std::uniform_real_distribution<float>(0, 3.14f * 2.0f)(rand);
 		enep = std::make_shared<EnemyActor>(
 			&heightMap, meshBuffer, position, rotation);
-		/*enep->colLocal = Collision::CreateCapsule(
-			glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);*/
+		enep->colLocal = Collision::CreateCapsule(
+			glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);
 
 			//追いかけるターゲットを指定
 		enep->SetTarget(player);
 		enemies.Add(enep);
 	}
+	const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
+	const size_t markCount = oniCount;//鬼の数だけマークを用意する
+	for (size_t i = 0; i < markCount; i++)
+	{
+		glm::vec3 position(pos);
+		position.x = enep->position.x;
+		position.z = enep->position.z;
+		position.y = heightMap.Height(position)+1;
+
+		glm::vec3 rotation(0);
+		StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
+			mesh, "marks", 13, position, rotation);
+		/*p->colLocal = Collision::CreateCapsule(
+			glm::vec3(0, 0, 0), glm::vec3(0, 3, 0), 0.3f);*/
+		marks.Add(p);
+	}
+
+
 	return true;
 }
 
@@ -861,6 +881,7 @@ void MainGameScene::RenderMesh(Mesh::DrawType drawType)
 	enemies.Draw(drawType);
 	trees.Draw(drawType);
 	objects.Draw(drawType);
+	marks.Draw(drawType);
 
 	glm::vec3 treePos(110, 0, 110);
 	treePos.y = heightMap.Height(treePos);
