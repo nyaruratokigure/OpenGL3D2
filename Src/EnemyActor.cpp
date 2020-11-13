@@ -340,8 +340,6 @@ void EnemyActor::Inactive()
 		}
 		
 	}
-	//BGM,非アクティブつくる
-	//playerのいる向きに当たる数値を移動させて範囲の値rotation.yから作成して固定
 }
 
 /*
@@ -431,7 +429,6 @@ void EnemyActor::Feint() {
 		}
 		
 		//移動先を設定
-		//move = glm::normalize(-d);//エネミーの後方の単位ベクトル
 		targetPos = position + move * glm::vec3(2.0f, 0, 2.0f);
 		
 		onlyOnce = true;

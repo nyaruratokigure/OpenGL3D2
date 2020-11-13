@@ -387,7 +387,7 @@ void MainGameScene::Update(float deltaTime)
 	trees.Update(deltaTime);
 	objects.Update(deltaTime);
 	lights.Update(deltaTime);
-	marks.Update(deltaTime);
+	//marks.Update(deltaTime);
 
 	DetectCollision(player, enemies);
 	DetectCollision(player, trees);
@@ -456,6 +456,7 @@ void MainGameScene::Update(float deltaTime)
 					bb->colLocal = Collision::Shape{};
 					hitEffect = true;
 					bb->Dead();
+					bgm->Stop();
 					Audio::Engine::Instance().Prepare("Res/Audio/PlayerDead.wav")->Play();
 					bb->GetMesh()->Play("Down", false);//プレイヤーの死亡時のアニメーション
 				}
@@ -479,6 +480,7 @@ void MainGameScene::Update(float deltaTime)
 		PlayerActorPtr bb = std::static_pointer_cast<PlayerActor>(player);
 		bb->health = 0;
 		bb->Dead();
+		bgm->Stop();
 		Audio::Engine::Instance().Prepare("Res/Audio/PlayerDead.wav")->Play();
 		bb->GetMesh()->Play("Down", false);//プレイヤーの死亡時のアニメーション
 	}
@@ -564,7 +566,7 @@ void MainGameScene::Update(float deltaTime)
 	enemies.UpdateDrawData(deltaTime);
 	trees.UpdateDrawData(deltaTime);
 	objects.UpdateDrawData(deltaTime);
-	marks.UpdateDrawData(deltaTime);
+	//marks.UpdateDrawData(deltaTime);
 
 	spriteRenderer.BeginUpdate();
 	for (const Sprite& e : sprites) {
@@ -830,22 +832,22 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		enep->SetTarget(player);
 		enemies.Add(enep);
 	}
-	const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
-	const size_t markCount = oniCount;//鬼の数だけマークを用意する
-	for (size_t i = 0; i < markCount; i++)
-	{
-		glm::vec3 position(pos);
-		position.x = enep->position.x;
-		position.z = enep->position.z;
-		position.y = heightMap.Height(position)+1;
+	//const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
+	//const size_t markCount = oniCount;//鬼の数だけマークを用意する
+	//for (size_t i = 0; i < markCount; i++)
+	//{
+	//	glm::vec3 position(pos);
+	//	position.x = enep->position.x;
+	//	position.z = enep->position.z;
+	//	position.y = heightMap.Height(position)+3.0f;
 
-		glm::vec3 rotation(0);
-		StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
-			mesh, "marks", 13, position, rotation);
-		/*p->colLocal = Collision::CreateCapsule(
-			glm::vec3(0, 0, 0), glm::vec3(0, 3, 0), 0.3f);*/
-		marks.Add(p);
-	}
+	//	glm::vec3 rotation(0);
+	//	StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
+	//		mesh, "marks", 13, position, rotation);
+	//	/*p->colLocal = Collision::CreateCapsule(
+	//		glm::vec3(0, 0, 0), glm::vec3(0, 3, 0), 0.3f);*/
+	//	marks.Add(p);
+	//}
 
 
 	return true;
@@ -881,7 +883,7 @@ void MainGameScene::RenderMesh(Mesh::DrawType drawType)
 	enemies.Draw(drawType);
 	trees.Draw(drawType);
 	objects.Draw(drawType);
-	marks.Draw(drawType);
+	//marks.Draw(drawType);
 
 	glm::vec3 treePos(110, 0, 110);
 	treePos.y = heightMap.Height(treePos);
