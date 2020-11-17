@@ -274,9 +274,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Res\hikatyo.jpg">
-      <Filter>リソース ファイル</Filter>
-    </Image>
     <Image Include="Res\TitleBg.tga">
       <Filter>リソース ファイル</Filter>
     </Image>
@@ -305,9 +302,6 @@
       <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="Res\FireParticle.tga">
-      <Filter>リソース ファイル</Filter>
-    </Image>
-    <Image Include="Res\ao.tga">
       <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="Mist.tga">

@@ -18,7 +18,8 @@ EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 	: SkeletalMeshActor(buffer.GetSkeletalMesh("oni_small"), "Enemy", 3, pos, rot),
 	heightMap(hm)
 {
-	colLocal = Collision::CreateSphere(glm::vec3(0, 0.7f, 0), 0.7f);
+	colLocal = Collision::CreateCapsule(
+		glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);
 	GetMesh()->Play("Idle.LookAround");
 	state = State::inactive;
 }
@@ -229,12 +230,13 @@ void EnemyActor::Update(float deltaTime)
 */
 void EnemyActor::OnHit(const ActorPtr& b, const glm::vec3& p)
 {
-	const glm::vec3 v = colWorld.s.center - p;
+	const glm::vec3 c = (colWorld.c.seg.a + colWorld.c.seg.b) / 2.0f;
+	const glm::vec3 v = c - p;
 	//Õ“ËˆÊ’u‚Æ‚Ì‹——£‚ª‹ß‚·‚¬‚È‚¢‚©’²‚×‚é
 	if (dot(v, v) > FLT_EPSILON) {
 		//this‚ðb‚Éd‚È‚ç‚È‚¢ˆÊ’u‚Ü‚ÅˆÚ“®
 		const glm::vec3 vn = normalize(v);
-		float radiusSum = colWorld.s.r;
+		float radiusSum = colWorld.c.r;
 		switch (b->colWorld.type) {
 		case Collision::Shape::Type::sphere: radiusSum += b->colWorld.s.r; break;
 		case Collision::Shape::Type::capsule: radiusSum += b->colWorld.c.r; break;

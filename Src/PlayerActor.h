@@ -50,6 +50,7 @@ private:
 	float moveSpeed = 5.0f;    ///<ˆÚ“®‘¬“x
 	ActorPtr attackCollision;  ///<UŒ‚”»’è
 	float attackTimer = 0;     ///<UŒ‚ŽžŠÔ
+	int attackCombo = 0;
 
 	const Terrain::HeightMap* heightMap = nullptr;
 

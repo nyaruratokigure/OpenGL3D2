@@ -249,10 +249,8 @@
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_lf.tga" />
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_rt.tga" />
     <Image Include="C:\Users\satok\Downloads\icyhell\icyhell_up.tga" />
-    <Image Include="Res\ao.tga" />
     <Image Include="Res\DiskParticle.tga" />
     <Image Include="Res\FireParticle.tga" />
-    <Image Include="Res\hikatyo.jpg" />
     <Image Include="Res\Terrain_Plant_Normal.tga" />
     <Image Include="Res\TitleBg.tga" />
   </ItemGroup>

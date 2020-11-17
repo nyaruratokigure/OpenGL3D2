@@ -61,7 +61,7 @@ bool MainGameScene::Initialize()
 {
 	spriteRenderer.Init(1000, "Res/Sprite.vert", "Res/Sprite.frag");
 	sprites.reserve(100);
-	Sprite spr(Texture::Image2D::Create("Res/kuro.tga"));
+	Sprite spr(Texture::Image2D::Create("Res/Map.tga"));
 	spr.Scale(glm::vec2(2));
 	sprites.push_back(spr);
 
@@ -387,7 +387,7 @@ void MainGameScene::Update(float deltaTime)
 	trees.Update(deltaTime);
 	objects.Update(deltaTime);
 	lights.Update(deltaTime);
-	//marks.Update(deltaTime);
+	marks.Update(deltaTime);
 
 	DetectCollision(player, enemies);
 	DetectCollision(player, trees);
@@ -566,7 +566,7 @@ void MainGameScene::Update(float deltaTime)
 	enemies.UpdateDrawData(deltaTime);
 	trees.UpdateDrawData(deltaTime);
 	objects.UpdateDrawData(deltaTime);
-	//marks.UpdateDrawData(deltaTime);
+	marks.UpdateDrawData(deltaTime);
 
 	spriteRenderer.BeginUpdate();
 	for (const Sprite& e : sprites) {
@@ -825,31 +825,28 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		rotation.y = std::uniform_real_distribution<float>(0, 3.14f * 2.0f)(rand);
 		enep = std::make_shared<EnemyActor>(
 			&heightMap, meshBuffer, position, rotation);
-		enep->colLocal = Collision::CreateCapsule(
-			glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);
 
 			//追いかけるターゲットを指定
 		enep->SetTarget(player);
 		enemies.Add(enep);
 	}
-	//const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
-	//const size_t markCount = oniCount;//鬼の数だけマークを用意する
-	//for (size_t i = 0; i < markCount; i++)
-	//{
-	//	glm::vec3 position(pos);
-	//	position.x = enep->position.x;
-	//	position.z = enep->position.z;
-	//	position.y = heightMap.Height(position)+3.0f;
 
-	//	glm::vec3 rotation(0);
-	//	StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
-	//		mesh, "marks", 13, position, rotation);
-	//	/*p->colLocal = Collision::CreateCapsule(
-	//		glm::vec3(0, 0, 0), glm::vec3(0, 3, 0), 0.3f);*/
-	//	marks.Add(p);
-	//}
+	const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
+	const size_t markCount = oniCount;//鬼の数だけマークを用意する
+	for (size_t i = 0; i < markCount; i++)
+	{
+		glm::vec3 position(pos);
+		position.x = enep->position.x;
+		position.z = enep->position.z;
+		position.y = heightMap.Height(position) + 2.0f;
 
-
+		glm::vec3 rotation(0);
+		glm::vec3 scale(0.05);
+		StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
+			mesh, "marks", 13, position, rotation, scale);
+		marks.Add(p);
+	}
+	
 	return true;
 }
 
@@ -883,7 +880,7 @@ void MainGameScene::RenderMesh(Mesh::DrawType drawType)
 	enemies.Draw(drawType);
 	trees.Draw(drawType);
 	objects.Draw(drawType);
-	//marks.Draw(drawType);
+	marks.Draw(drawType);
 
 	glm::vec3 treePos(110, 0, 110);
 	treePos.y = heightMap.Height(treePos);

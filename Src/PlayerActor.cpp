@@ -194,10 +194,10 @@ void PlayerActor::CheckAttack(const GamePad& gamepad)
 
 	if (gamepad.buttonDown & GamePad::A) {
 		if (!attackCollision) {
-			//GetMesh()->Play("Attack.Light", false);
 			GetMesh()->Play("Attack.Light", false);
 			attackTimer = 0;
 			state = State::attack;
+
 		}
 	}
 }
