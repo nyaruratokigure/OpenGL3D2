@@ -169,6 +169,7 @@
     <ClInclude Include="Src\json11\json11.hpp" />
     <ClInclude Include="Src\Light.h" />
     <ClInclude Include="Src\MainGameScene.h" />
+    <ClInclude Include="Src\Mark.h" />
     <ClInclude Include="Src\Mesh.h" />
     <ClInclude Include="Src\Particle.h" />
     <ClInclude Include="Src\PlayerActor.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="Src\json11\json11.cpp" />
     <ClCompile Include="Src\Light.cpp" />
     <ClCompile Include="Src\MainGameScene.cpp" />
+    <ClCompile Include="Src\Mark.cpp" />
     <ClCompile Include="Src\Mesh.cpp" />
     <ClCompile Include="Src\Particle.cpp" />
     <ClCompile Include="Src\PlayerActor.cpp" />

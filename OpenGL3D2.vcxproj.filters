@@ -117,6 +117,9 @@
     <ClInclude Include="Src\ClearScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Mark.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Scene.cpp">
@@ -213,6 +216,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Src\ClearScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Mark.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
