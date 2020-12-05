@@ -41,6 +41,8 @@ private:
 	void RenderMesh(Mesh::DrawType);
 	bool hitEffect = false;
 	bool flag = false;
+	bool hitAtk = false;
+	bool onlyOnce = false;
 	std::mt19937 rand;
 	int particleID = 0;
 	int jizoCount = 4;

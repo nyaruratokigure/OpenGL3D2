@@ -29,9 +29,7 @@ public:
 		dead = true;
 	}
 	void Damage();
-	float actionTimer = 0.0f;  ///<行動制御用のタイマー
-	int nowAction = 0;         ///<選択中の行動.0未発見、1ニュートラル、2移動、3攻撃、4ダメージ、5フェイント
-	int feintD = 0;          ///<フェイントの方向
+	
 	
 	float targett;
 	
@@ -60,6 +58,10 @@ private:
 	float moveSpeed = 3.0f;    ///<移動速度
 	float feintSpped = 2.0f;   ///<フェイント時の移動速度
 	float attackTimer = 0.0f;  ///<攻撃時間	
+	float actionTimer = 0.0f;  ///<行動制御用のタイマー
+	float frontRange = glm::radians(15.0f); ///<敵が感知する範囲
+	int nowAction = 0;         ///<選択中の行動.0未発見、1ニュートラル、2移動、3攻撃、4ダメージ、5フェイント
+	int feintD = 0;          ///<フェイントの方向
 	
 	
 	ActorPtr attackCollision;  ///<攻撃判定

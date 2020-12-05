@@ -54,5 +54,5 @@ void SkeletalMeshActor::Draw(Mesh::DrawType drawType)
 }
 
 void SkeletalMeshActor::SetTarget(ActorPtr name) {
-	TAct= name;
+	tAct= name;
 }

@@ -21,7 +21,7 @@ public:
 
   const Mesh::SkeletalMeshPtr& GetMesh() const { return mesh; }
   virtual void SetTarget(ActorPtr name);
-   ActorPtr TAct;
+   ActorPtr tAct;
 
 private:
   Mesh::SkeletalMeshPtr mesh;

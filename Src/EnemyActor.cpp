@@ -259,7 +259,7 @@ void EnemyActor::OnHit(const ActorPtr& b, const glm::vec3& p)
 }
 
 float EnemyActor::PlayerDist() {
-	glm::vec3 v = TAct->position - position;
+	glm::vec3 v = tAct->position - position;
 
 	v.y = 0;
 
@@ -300,16 +300,26 @@ void EnemyActor::SetBoardingActor(ActorPtr p)
 
 void EnemyActor::Inactive()
 {
-	glm::vec3 v = TAct->position - position;
+	glm::vec3 v = tAct->position - position;
 
 	v.y = 0;
 
 	float dist = glm::length(v);//ターゲットまでの距離
-	glm::vec3 direction = glm::normalize(v);//ターゲットへの単位ベクトル
+	glm::vec3 target = glm::normalize(v);//ターゲットへの単位ベクトル
 
-	float target = std::atan2(-direction.z, direction.x);
+	float radian = std::atan2(-target.z, target.x)-glm::radians(90.0f);
+	if (radian <= 0) {
+		radian += glm::radians(360.0f);
+	}
+	if (std::abs(radian - rotation.y) > frontRange) {
+		return;
+	}
+	else {
+		nowAction = 1;
+	}
+}
 
-	float A = rotation.y - 1.0f;
+	/*float A = rotation.y - 1.0f;
 	float B = rotation.y + 1.0f;
 	float C = 0;
 	float pi = M_PI;
@@ -341,8 +351,8 @@ void EnemyActor::Inactive()
 			}
 		}
 		
-	}
-}
+	}*/
+
 
 /*
 移動を処理する
@@ -350,7 +360,7 @@ void EnemyActor::Inactive()
 void EnemyActor::Move()
 {
 	//ターゲットへのベクトルを計算
-	glm::vec3 v = TAct->position - position;
+	glm::vec3 v = tAct->position - position;
 
 	v.y = 0;
 
@@ -396,7 +406,7 @@ void EnemyActor::Move()
 }
 void EnemyActor::Feint() {
 	//エネミーがプレイヤーの方向を見るように設定
-	glm::vec3 d = TAct->position - position;
+	glm::vec3 d = tAct->position - position;
 	d.y = 0;
 	glm::vec3 direction = glm::normalize(d);//エネミーの前方の単位ベクトル
 

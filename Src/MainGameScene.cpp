@@ -379,8 +379,31 @@ void MainGameScene::Update(float deltaTime)
 {
 	//カメラの状態を更新
 	{
-		camera.target = player->position;
-		camera.position = camera.target + glm::vec3(0, 8, 13);
+		if (hitAtk) {
+			float shakeTime;
+			if (!onlyOnce) {
+				shakeTime = 0.5f;
+				onlyOnce = true;
+			}
+			camera.target = player->position;
+			camera.position = camera.target + glm::vec3(0, 8, 13);
+			glm::vec3 cameraShake = glm::vec3(0, 1, 1);
+			shakeTime -= deltaTime;
+			if (shakeTime >= 0.25f) {
+				camera.position += cameraShake;
+			}
+			else {
+				camera.position -= cameraShake;
+				if (shakeTime < 0) {
+					onlyOnce = false;
+					hitAtk = false;
+				}
+			}
+		}
+		else {
+			camera.target = player->position;
+			camera.position = camera.target + glm::vec3(0, 8, 13);
+		}
 	}
 	player->Update(deltaTime);
 	enemies.Update(deltaTime);
@@ -407,6 +430,7 @@ void MainGameScene::Update(float deltaTime)
 			if (bb->health <= 0) {
 				bb->colLocal = Collision::Shape{};
 				hitEffect = true;
+				hitAtk = true;
 				bb->health = 1;
 
 				bb->Dead();
@@ -415,6 +439,7 @@ void MainGameScene::Update(float deltaTime)
 			}
 			else {
 				hitEffect = true;
+				hitAtk = true;
 				Audio::Engine::Instance().Prepare("Res/Audio/PlayerAttack.wav")->Play();
 				bb->GetMesh()->Play("Hit", false);//敵がダメージを受けた際のアニメーション
 				bb->Damage();
@@ -455,6 +480,7 @@ void MainGameScene::Update(float deltaTime)
 				if (bb->health <= 0) {
 					bb->colLocal = Collision::Shape{};
 					hitEffect = true;
+					hitAtk = true;
 					bb->Dead();
 					bgm->Stop();
 					Audio::Engine::Instance().Prepare("Res/Audio/PlayerDead.wav")->Play();
@@ -462,6 +488,7 @@ void MainGameScene::Update(float deltaTime)
 				}
 				else {
 					hitEffect = true;
+					hitAtk = true;
 					Audio::Engine::Instance().Prepare("Res/Audio/EnemyAttack.wav")->Play();
 					bb->GetMesh()->Play("Hit", false);//プレイヤーがダメージを受けた際のアニメーション
 					bb->Damage(); bool nowCps = false;
