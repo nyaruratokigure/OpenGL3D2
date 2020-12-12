@@ -39,7 +39,8 @@ public:
 	glm::vec3 velocity = glm::vec3(0); ///< 速度.
 	int health = 0; ///< 体力.
 	Collision::Shape colLocal; ///<ローカル座標系の衝突形状
-	Collision::Shape colWorld; ///<ワールド座標系の衝突形状
+	Collision::Shape colWorld;
+	///<ワールド座標系の衝突形状
 };
 using ActorPtr = std::shared_ptr<Actor>;
 

@@ -491,7 +491,8 @@ void MainGameScene::Update(float deltaTime)
 					hitAtk = true;
 					Audio::Engine::Instance().Prepare("Res/Audio/EnemyAttack.wav")->Play();
 					bb->GetMesh()->Play("Hit", false);//プレイヤーがダメージを受けた際のアニメーション
-					bb->Damage(); bool nowCps = false;
+					bb->Damage(); 
+					bool nowCps = false;
 				}
 				hit = true;
 			}
