@@ -15,6 +15,8 @@
 #include <iostream>
 #include <random>
 #include <sstream>
+#include <thread>
+#include <mutex>
 
 /*
 衝突を解決する
@@ -377,34 +379,34 @@ void MainGameScene::ProcessInput()
 */
 void MainGameScene::Update(float deltaTime)
 {
-	//カメラの状態を更新
-	{
-		if (hitAtk) {
-			float shakeTime;
-			if (!onlyOnce) {
-				shakeTime = 0.5f;
-				onlyOnce = true;
-			}
-			camera.target = player->position;
-			camera.position = camera.target + glm::vec3(0, 8, 13);
-			glm::vec3 cameraShake = glm::vec3(0, 1, 1);
-			shakeTime -= deltaTime;
-			if (shakeTime >= 0.25f) {
-				camera.position += cameraShake;
-			}
-			else {
-				camera.position -= cameraShake;
-				if (shakeTime < 0) {
-					onlyOnce = false;
-					hitAtk = false;
-				}
-			}
-		}
-		else {
-			camera.target = player->position;
-			camera.position = camera.target + glm::vec3(0, 8, 13);
-		}
-	}
+	////カメラの状態を更新
+	//{
+	//	if (hitAtk) {
+	//		float shakeTime;
+	//		if (!onlyOnce) {
+	//			shakeTime = 0.5f;
+	//			onlyOnce = true;
+	//		}
+	//		camera.target = player->position;
+	//		camera.position = camera.target + glm::vec3(0, 8, 13);
+	//		glm::vec3 cameraShake = glm::vec3(0, 1, 1);
+	//		shakeTime -= deltaTime;
+	//		if (shakeTime >= 0.25f) {
+	//			camera.position += cameraShake;
+	//		}
+	//		else {
+	//			camera.position -= cameraShake;
+	//			if (shakeTime < 0) {
+	//				onlyOnce = false;
+	//				hitAtk = false;
+	//			}
+	//		}
+	//	}
+	//	else {
+	//		camera.target = player->position;
+	//		camera.position = camera.target + glm::vec3(0, 8, 13);
+	//	}
+	//}
 	player->Update(deltaTime);
 	enemies.Update(deltaTime);
 	trees.Update(deltaTime);
@@ -492,7 +494,7 @@ void MainGameScene::Update(float deltaTime)
 					Audio::Engine::Instance().Prepare("Res/Audio/EnemyAttack.wav")->Play();
 					bb->GetMesh()->Play("Hit", false);//プレイヤーがダメージを受けた際のアニメーション
 					bb->Damage(); 
-					bool nowCps = false;
+
 				}
 				hit = true;
 			}
@@ -859,21 +861,21 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		enemies.Add(enep);
 	}
 
-	const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
-	const size_t markCount = oniCount;//鬼の数だけマークを用意する
-	for (size_t i = 0; i < markCount; i++)
-	{
-		glm::vec3 position(pos);
-		position.x = enep->position.x;
-		position.z = enep->position.z;
-		position.y = heightMap.Height(position) + 2.0f;
+	//const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
+	//const size_t markCount = oniCount;//鬼の数だけマークを用意する
+	//for (size_t i = 0; i < markCount; i++)
+	//{
+	//	glm::vec3 position(pos);
+	//	position.x = enep->position.x;
+	//	position.z = enep->position.z;
+	//	position.y = heightMap.Height(position) + 2.0f;
 
-		glm::vec3 rotation(0);
-		glm::vec3 scale(0.05);
-		StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
-			mesh, "marks", 13, position, rotation, scale);
-		marks.Add(p);
-	}
+	//	glm::vec3 rotation(0);
+	//	glm::vec3 scale(0.05);
+	//	StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
+	//		mesh, "marks", 13, position, rotation, scale);
+	//	marks.Add(p);
+	//}
 	
 	return true;
 }

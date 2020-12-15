@@ -14,7 +14,7 @@
 @param rot    エネミーの初期方向
 */
 EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
-	const glm::vec3& pos, const glm::vec3& rot)
+	const MainGameScene mark,const glm::vec3& pos, const glm::vec3& rot)
 	: SkeletalMeshActor(buffer.GetSkeletalMesh("oni_small"), "Enemy", 3, pos, rot),
 	heightMap(hm)
 {
@@ -143,6 +143,7 @@ void EnemyActor::Update(float deltaTime)
 
 		case State::inactive:
 			if (nowAction != 0) {
+				isSearch = false;
 				GetMesh()->Play("Idle");
 				state = State::idle;
 			}
@@ -490,4 +491,7 @@ void EnemyActor::Damage() {
 	velocity = glm::vec3(0);
 	nowAttack = false;
 	state = State::damage;
+}
+void EnemyActor::Dead() {
+	dead = true;
 }

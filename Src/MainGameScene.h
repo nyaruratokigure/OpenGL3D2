@@ -90,7 +90,6 @@ private:
 	ActorList marks;
 	EnemyActorPtr enep;
 
-
 	LightBuffer lightBuffer;
 	ActorList lights;
 

@@ -5,8 +5,10 @@
 #define ENEMYACTOR_H_INCLUDED
 #define _USE_MATH_DEFINES
 #include "GLFWEW.h"
+#include "MainGameScene.h"
 #include "SkeletalMeshActor.h"
 #include "Terrain.h"
+#include "Mark.h"
 #include <memory>
 #include <math.h>
 
@@ -17,22 +19,17 @@ class EnemyActor : public SkeletalMeshActor
 {
 public:
 	EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
-		const glm::vec3& pos, const glm::vec3&rot = glm::vec3(0));
+		const MainGameScene marks,const glm::vec3& pos, const glm::vec3&rot = glm::vec3(0));
 	virtual ~EnemyActor() = default;
 
 	virtual void Update(float) override;
 	virtual void OnHit(const ActorPtr&, const glm::vec3&);
 	void SetBoardingActor(ActorPtr p);
 	const ActorPtr& GetAttackCollision() const { return attackCollision; }
-	bool dead=false;
-	void Dead() {
-		dead = true;
-	}
 	void Damage();
+	void Dead();
 	
-	
-	float targett;
-	
+	bool isSearch = true;      ///<未発見時ならtrue
 private:
 	float PlayerDist();
 	void Inactive();///<非アクティブ、プレイヤーを発見する前の状態
@@ -55,6 +52,7 @@ private:
 	bool isInAir = false;      ///<空中判定フラグ
 	bool nowAttack = false;	   ///<攻撃中かどうか
 	bool onlyOnce = false;     ///<目標座標の設定などに使用
+    bool dead = false;         ///<死亡しているかどうか
 	float moveSpeed = 3.0f;    ///<移動速度
 	float feintSpped = 2.0f;   ///<フェイント時の移動速度
 	float attackTimer = 0.0f;  ///<攻撃時間	
@@ -66,16 +64,12 @@ private:
 	
 	ActorPtr attackCollision;  ///<攻撃判定
 	ActorPtr boardingActor;    ///<乗っているアクター
-	
 
 	//int probability = 0;	   ///<確率
 	glm::vec3 targetPos;
 	glm::vec3 move;
 	glm::vec3 direction;
 
-
-	
-	
 	const Terrain::HeightMap* heightMap = nullptr;
 };
 using EnemyActorPtr = std::shared_ptr<EnemyActor>;
