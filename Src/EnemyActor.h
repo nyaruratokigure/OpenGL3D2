@@ -5,12 +5,12 @@
 #define ENEMYACTOR_H_INCLUDED
 #define _USE_MATH_DEFINES
 #include "GLFWEW.h"
-#include "MainGameScene.h"
 #include "SkeletalMeshActor.h"
 #include "Terrain.h"
 #include "Mark.h"
 #include <memory>
 #include <math.h>
+class MainGameScene;
 
 /*
 エネミーアクター
@@ -19,7 +19,7 @@ class EnemyActor : public SkeletalMeshActor
 {
 public:
 	EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
-		const MainGameScene marks,const glm::vec3& pos, const glm::vec3&rot = glm::vec3(0));
+		const MarkPtr& mp,const glm::vec3& pos, const glm::vec3&rot = glm::vec3(0));
 	virtual ~EnemyActor() = default;
 
 	virtual void Update(float) override;
@@ -29,7 +29,6 @@ public:
 	void Damage();
 	void Dead();
 	
-	bool isSearch = true;      ///<未発見時ならtrue
 private:
 	float PlayerDist();
 	void Inactive();///<非アクティブ、プレイヤーを発見する前の状態
@@ -64,6 +63,8 @@ private:
 	
 	ActorPtr attackCollision;  ///<攻撃判定
 	ActorPtr boardingActor;    ///<乗っているアクター
+	MarkPtr markp;
+	ActorList marks;
 
 	//int probability = 0;	   ///<確率
 	glm::vec3 targetPos;

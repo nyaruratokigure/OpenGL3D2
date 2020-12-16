@@ -2,6 +2,7 @@
 @file EnemyActor.cpp
 */
 #include "EnemyActor.h"
+#include "MainGameScene.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include<algorithm>
 
@@ -10,11 +11,12 @@
 
 @param hm     エネミーの着地判定に使用する高さマップ
 @param buffer エネミーのメッシュデータを持つメッシュバッファ
+@param ms     エネミーの反応を表すマークのポインタ
 @param pos    エネミーの初期座標
 @param rot    エネミーの初期方向
 */
 EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
-	const MainGameScene mark,const glm::vec3& pos, const glm::vec3& rot)
+	const MarkPtr& mp,const glm::vec3& pos, const glm::vec3& rot)
 	: SkeletalMeshActor(buffer.GetSkeletalMesh("oni_small"), "Enemy", 3, pos, rot),
 	heightMap(hm)
 {
@@ -22,6 +24,7 @@ EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 		glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);
 	GetMesh()->Play("Idle.LookAround");
 	state = State::inactive;
+	//markp->position.x;
 }
 /*
 更新
@@ -143,7 +146,6 @@ void EnemyActor::Update(float deltaTime)
 
 		case State::inactive:
 			if (nowAction != 0) {
-				isSearch = false;
 				GetMesh()->Play("Idle");
 				state = State::idle;
 			}

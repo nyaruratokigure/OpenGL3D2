@@ -846,32 +846,37 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 	const size_t oniCount = 1;//出現させる敵の数
 	for (size_t i = 0; i < oniCount; i++)
 	{
-		glm::vec3 position(pos);
-		position.x += std::uniform_real_distribution<float>(-10, 10)(rand);
-		position.z += std::uniform_real_distribution<float>(-10, 10)(rand);
-		position.y = heightMap.Height(position);
-
+		glm::vec3 ePosition(pos);
+		ePosition.x += std::uniform_real_distribution<float>(-10, 10)(rand);
+		ePosition.z += std::uniform_real_distribution<float>(-10, 10)(rand);
+		ePosition.y = heightMap.Height(ePosition);
 		glm::vec3 rotation(0);
 		rotation.y = std::uniform_real_distribution<float>(0, 3.14f * 2.0f)(rand);
+
+		const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
+		glm::vec3 mPosition(pos);
+		mPosition = glm::vec3(0);
+		glm::vec3 scale(0.05);
+		MarkPtr p = std::make_shared<Mark>(
+			mesh, mPosition, scale);
+
 		enep = std::make_shared<EnemyActor>(
-			&heightMap, meshBuffer, position, rotation);
+			&heightMap, meshBuffer,p, ePosition, rotation);
 
 			//追いかけるターゲットを指定
 		enep->SetTarget(player);
 		enemies.Add(enep);
+		marks.Add(p);
 	}
 
-	//const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/exclamation.gltf");
+	
 	//const size_t markCount = oniCount;//鬼の数だけマークを用意する
 	//for (size_t i = 0; i < markCount; i++)
 	//{
-	//	glm::vec3 position(pos);
-	//	position.x = enep->position.x;
-	//	position.z = enep->position.z;
-	//	position.y = heightMap.Height(position) + 2.0f;
+	//	
 
 	//	glm::vec3 rotation(0);
-	//	glm::vec3 scale(0.05);
+	//	
 	//	StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(
 	//		mesh, "marks", 13, position, rotation, scale);
 	//	marks.Add(p);
