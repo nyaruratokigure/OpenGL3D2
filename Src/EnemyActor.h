@@ -10,6 +10,7 @@
 #include "Mark.h"
 #include <memory>
 #include <math.h>
+#include "iostream"
 class MainGameScene;
 
 /*
@@ -51,6 +52,7 @@ private:
 	bool isInAir = false;      ///<空中判定フラグ
 	bool nowAttack = false;	   ///<攻撃中かどうか
 	bool onlyOnce = false;     ///<目標座標の設定などに使用
+	bool active = false;
     bool dead = false;         ///<死亡しているかどうか
 	float moveSpeed = 3.0f;    ///<移動速度
 	float feintSpped = 2.0f;   ///<フェイント時の移動速度

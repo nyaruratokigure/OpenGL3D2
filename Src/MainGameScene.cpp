@@ -289,7 +289,7 @@ bool MainGameScene::Initialize()
 
 	//マークを配置
 	{
-		const size_t markCount = 10;
+		const size_t markCount = 30;
 		marks.Reserve(markCount);
 	}
 
@@ -379,34 +379,36 @@ void MainGameScene::ProcessInput()
 */
 void MainGameScene::Update(float deltaTime)
 {
-	////カメラの状態を更新
-	//{
-	//	if (hitAtk) {
-	//		float shakeTime;
-	//		if (!onlyOnce) {
-	//			shakeTime = 0.5f;
-	//			onlyOnce = true;
-	//		}
-	//		camera.target = player->position;
-	//		camera.position = camera.target + glm::vec3(0, 8, 13);
-	//		glm::vec3 cameraShake = glm::vec3(0, 1, 1);
-	//		shakeTime -= deltaTime;
-	//		if (shakeTime >= 0.25f) {
-	//			camera.position += cameraShake;
-	//		}
-	//		else {
-	//			camera.position -= cameraShake;
-	//			if (shakeTime < 0) {
-	//				onlyOnce = false;
-	//				hitAtk = false;
-	//			}
-	//		}
-	//	}
-	//	else {
-	//		camera.target = player->position;
-	//		camera.position = camera.target + glm::vec3(0, 8, 13);
-	//	}
-	//}
+	//カメラの状態を更新
+	camera.target = player->position;
+	camera.position = camera.target + glm::vec3(0, 8, 13);
+	/*{
+		if (hitAtk) {
+			float shakeTime;
+			if (!onlyOnce) {
+				shakeTime = 0.5f;
+				onlyOnce = true;
+			}
+			camera.target = player->position;
+			camera.position = camera.target + glm::vec3(0, 8, 13);
+			glm::vec3 cameraShake = glm::vec3(0, 1, 1);
+			shakeTime -= deltaTime;
+			if (shakeTime >= 0.25f) {
+				camera.position += cameraShake;
+			}
+			else {
+				camera.position -= cameraShake;
+				if (shakeTime < 0) {
+					onlyOnce = false;
+					hitAtk = false;
+				}
+			}
+		}
+		else {
+			camera.target = player->position;
+			camera.position = camera.target + glm::vec3(0, 8, 13);
+		}
+	}*/
 	player->Update(deltaTime);
 	enemies.Update(deltaTime);
 	trees.Update(deltaTime);
@@ -843,7 +845,7 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		return false;
 	}
 	jizoId = id;
-	const size_t oniCount = 1;//出現させる敵の数
+	const size_t oniCount = 3;//出現させる敵の数
 	for (size_t i = 0; i < oniCount; i++)
 	{
 		glm::vec3 ePosition(pos);
@@ -858,7 +860,7 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 		mPosition = glm::vec3(0);
 		glm::vec3 scale(0.05);
 		MarkPtr p = std::make_shared<Mark>(
-			mesh, mPosition, scale);
+			mesh,1, mPosition, scale);
 
 		enep = std::make_shared<EnemyActor>(
 			&heightMap, meshBuffer,p, ePosition, rotation);

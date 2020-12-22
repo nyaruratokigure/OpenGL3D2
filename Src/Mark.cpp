@@ -2,6 +2,7 @@
 @file Mark.cpp
 */
 #include "Mark.h"
+#include "EnemyActor.h"
 
 /*
 コンストラクタ
@@ -10,7 +11,7 @@
 @param position 位置
 @param scare    拡大率 
 */
-Mark::Mark(const Mesh::FilePtr& m, const glm::vec3& position, const glm::vec3& scale)
+Mark::Mark(const Mesh::FilePtr& m,int health, const glm::vec3& position, const glm::vec3& scale)
 	:StaticMeshActor(m,name,health,position,rotation,scale)
 {
 
@@ -18,14 +19,15 @@ Mark::Mark(const Mesh::FilePtr& m, const glm::vec3& position, const glm::vec3& s
 
 //マークを更新する
 void Mark::Update(float deltaTime) {
-	if (timer >= 0) {
-		timer -= deltaTime;
+	timer -= deltaTime;
+	if (timer <= 0) {
+
+		position = glm::vec3(0);
+
 	}
-	else {
-		for (size_t i = 0; i < markCount; ++i) {
-			marks.Remove(p);
-		}
-	}
-	position.y += 2.0f;
-	
+
+}
+
+int Mark::Brunch(){
+
 }

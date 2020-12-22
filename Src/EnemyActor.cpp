@@ -24,7 +24,7 @@ EnemyActor::EnemyActor(const Terrain::HeightMap* hm, const Mesh::Buffer& buffer,
 		glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0), 0.5f);
 	GetMesh()->Play("Idle.LookAround");
 	state = State::inactive;
-	//markp->position.x;
+	markp = mp;
 }
 /*
 更新
@@ -77,10 +77,23 @@ void EnemyActor::Update(float deltaTime)
 	}
 
 
+
 	//座標の更新
 	SkeletalMeshActor::Update(deltaTime);
 	if (attackCollision) {
 		attackCollision->Update(deltaTime);
+	}
+
+	//マークの更新
+
+	if (active) {
+		std::cout << "マーク表示した" << std::endl;
+		markp->position.x = position.x;
+		markp->position.z = position.z;
+		markp->position.y = position.y + 2.0f;
+
+
+		markp->Update(deltaTime);
 	}
 
 	//接地判定
@@ -145,9 +158,11 @@ void EnemyActor::Update(float deltaTime)
 		break;
 
 		case State::inactive:
-			if (nowAction != 0) {
+			if (nowAction != 0) { 
+				active = true;
 				GetMesh()->Play("Idle");
 				state = State::idle;
+				
 			}
 
 			break;
@@ -299,7 +314,6 @@ void EnemyActor::SetBoardingActor(ActorPtr p)
 		isInAir = false;
 	}
 }
-
 
 void EnemyActor::Inactive()
 {
@@ -490,6 +504,7 @@ void EnemyActor::Feint() {
 }
 void EnemyActor::Damage() {
 	nowAction = 4;
+	active = true;
 	velocity = glm::vec3(0);
 	nowAttack = false;
 	state = State::damage;
