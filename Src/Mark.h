@@ -16,7 +16,7 @@ public:
 		const glm::vec3&scale = glm::vec3(1));
 	virtual ~Mark() = default;
 	void Update(float deltaTime);
-	int Brunch();
+	/*int Brunch();*/
 	
 	
 

@@ -379,9 +379,13 @@ void MainGameScene::ProcessInput()
 */
 void MainGameScene::Update(float deltaTime)
 {
-	//カメラの状態を更新
 	camera.target = player->position;
-	camera.position = camera.target + glm::vec3(0, 8, 13);
+	camera.target +=glm::vec3(0,1,0);
+	camera.position = camera.target + glm::vec3(0, 2, 6);
+
+	//カメラの状態を更新
+	/*camera.target = player->position;
+	camera.position = camera.target + glm::vec3(0, 8, 13);*/
 	/*{
 		if (hitAtk) {
 			float shakeTime;
@@ -894,6 +898,10 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 */
 void MainGameScene::Camera::Update(const glm::mat4& matView)
 {
+	/*const GLFWEW::Window& window;*/
+	double x, y;
+	glfwGetCursorPos(, &x, &y);
+
 	const glm::vec4 pos = matView * glm::vec4(target, 1);
 	focalPlane = pos.z * -1000.0f;
 
