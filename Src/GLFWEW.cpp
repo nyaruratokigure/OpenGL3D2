@@ -307,4 +307,27 @@ void Window::UpdateGamePad()
 	gamepad.buttonDown = gamepad.buttons & ~prevButtons;
 }
 
+void Window::InputMouse() {
+	// マウスカーソル座標(左上原点、下が+Yのウィンドウ座標系)を変数xとyに取得
+	double x, y;
+	glfwGetCursorPos(window, &x, &y);
+	/* 取得した座標をOpenGL座標系に変換 */
+	 // ウィンドウサイズを変数wとhに取得
+	int w, h;
+	glfwGetWindowSize(window, &w, &h);
+
+	// 「左下原点、上が+Y」の座標系(OpenGLのスクリーン座標系)に変換
+	y = (h - 1) - y;
+
+	//「画面中心が原点、上が+Y」の座標系(OpenGLの二次元ワールド座標系)に変換
+	x -= w * 0.5;
+	y -= h * 0.5;
+
+	//座標をfloat型に変換してcursorPositionメンバ変数に代入
+	//OpenGLは基本的にfloat型で処理を行うので型を合わせておくと扱いやすい
+	cursorPosition.x = static_cast<float>(x);
+	cursorPosition.y = static_cast<float>(y);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
 }//namespase GLFWEW

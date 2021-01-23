@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include "GamePad.h"
 #include<GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace GLFWEW {
 
@@ -27,6 +28,7 @@ public:
 	int Height() const { return height; }
 	bool IsKeyPressed(int key)const;
 	const GamePad& GetGamePad() const;
+	void InputMouse();
 
 
 private:
@@ -44,6 +46,9 @@ private:
 	double prevTime = 0;
 	double deltaTime = 0;
 	GamePad gamepad;
+	
+	// マウスカーソルの座標(画面中心を0とするOpenGLの二次元ワールド座標系).
+	glm::vec2 cursorPosition = glm::vec2(0);
 };
 
 }//namespase GLFWEW

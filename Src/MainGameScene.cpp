@@ -380,8 +380,8 @@ void MainGameScene::ProcessInput()
 void MainGameScene::Update(float deltaTime)
 {
 	camera.target = player->position;
-	camera.target +=glm::vec3(0,1,0);
-	camera.position = camera.target + glm::vec3(0, 2, 6);
+	//camera.target +=glm::vec3(0,1,0);
+	camera.position = camera.target + glm::vec3(0, 8, 13);
 
 	//ƒJƒƒ‰‚Ìó‘Ô‚ðXV
 	/*camera.target = player->position;
@@ -898,10 +898,11 @@ bool MainGameScene::HandleJizoEffects(int id, const glm::vec3& pos)
 */
 void MainGameScene::Camera::Update(const glm::mat4& matView)
 {
-	/*const GLFWEW::Window& window;*/
-	double x, y;
-	glfwGetCursorPos(, &x, &y);
+	//const GLFWEW::Window& mouse = GLFWEW::Window::InputMouse();
 
+	GLFWEW::Window& window = GLFWEW::Window::Instance();
+	window.InputMouse();
+	 
 	const glm::vec4 pos = matView * glm::vec4(target, 1);
 	focalPlane = pos.z * -1000.0f;
 
@@ -916,7 +917,7 @@ void MainGameScene::Camera::Update(const glm::mat4& matView)
 void MainGameScene::RenderMesh(Mesh::DrawType drawType)
 {
 	/*glm::vec3 cubePos(100, 0, 100);
-	cubePos.y = heightMap.Height(cubePos);
+	cubePos.y = heightMap.Height(cubePos);7
 	const glm::mat4 matModel = glm::translate(glm::mat4(1), cubePos);
 	Mesh::Draw(meshBuffer.GetFile("Cube"), matModel,drawType);*/
 	Mesh::Draw(meshBuffer.GetFile("Terrain"), glm::mat4(1), drawType);
