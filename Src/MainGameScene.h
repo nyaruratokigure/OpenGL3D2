@@ -57,7 +57,7 @@ private:
 	float timer = 0;
 
 	struct Camera {
-		glm::vec2 cursorPosition = glm::vec2(0);
+		//glm::vec2 cursorPosition = glm::vec2(0);
 		glm::vec3 target = glm::vec3(100, 0, 100);
 		glm::vec3 position = glm::vec3(100, 50, 150);
 		glm::vec3 up = glm::vec3(0, 1, 0);
